@@ -1,0 +1,75 @@
+---
+title: "Project 2021"
+author: "Berthony Sully"
+date: "9/16/2021"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 1.Proposer un code permettant de regrouper les données contenues dans movies.zip dans un seul et même data.frame.
+
+```{r, message = FALSE} 
+#Attach the necessary libraries
+library(dplyr)
+library(readr)
+
+#1. Capture the raw pat of the zip folder
+raw_path <- "C:/Users/bsully/OneDrive - Université Paris 1 Panthéon-Sorbonne/Bureau/Project_2021_sol/movies.zip"
+
+#2. unzip the folder
+data <- unzip(raw_path, files = NULL, list = F, exdir = "movie_unzip")
+
+#3. Capture the new path to the folder that contains the datasets
+path_ <- "C:/Users/bsully/OneDrive - Université Paris 1 Panthéon-Sorbonne/Bureau/Project_2021_sol/movie_unzip"
+
+#4. Create a function to merge all the datasets
+merge_df = function(path_to_folder){
+
+  #capture the names of the files in the folder
+  list_name_file = list.files(path = path_to_folder, full.names = T)
+  
+  #read all the files in the folder
+  data_list = lapply(list_name_file, function(x){
+    read.csv(file = x, header = TRUE)
+    }) #x --> names of the files to read (in this case 'list_name_file')
+  
+  #combine the datasets with the reduce function 
+  #after merging them two by two (merge function)
+  Reduce(function(x, y){merge(x, y, all = T)}, data_list)
+}
+
+#5. Store the complete merged dataset
+complete_data <- merge_df(path_)
+```
+
+### 2. Observer pour chaque variable, le nombre et la proportion de valeurs manquantes.
+
+```{r}
+
+# summary(complete_data)
+
+```
+
+
+```{r, message=FALSE}
+na_num <- complete_data %>% summarise_all(funs(sum(is.na(.)))) 
+print.table(na_num)
+```
+```{r}
+print.table(na_num)
+```
+
+
+
+```{r}
+names(complete_data)
+```
+
+
+
+
