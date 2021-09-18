@@ -49,21 +49,29 @@ complete_data <- merge_df(path_)
 
 ### 2. Observer pour chaque variable, le nombre et la proportion de valeurs manquantes.
 
-```{r}
-
-# summary(complete_data)
-
-```
-
-
 ```{r, message=FALSE}
-na_num <- complete_data %>% summarise_all(funs(sum(is.na(.)))) 
+# Number of missing values
+na_num <- complete_data %>% 
+  summarise_all(funs(sum(is.na(.)))) 
+
 print.table(na_num)
 ```
 ```{r}
-print.table(na_num)
+#  Presentage of missng values
+na_percent <- round(na_num/sum(is.na(complete_data) * 100), 3)
+
+print.table(na_percent)
 ```
 
+### Représenter graphiquement la distribution de la durée des films
+
+```{r}
+library(tidyverse)
+complete_data$duration <- as.numeric(complete_data$duration)
+ggplot(complete_data, aes(x = duration)) + geom_histogram()
+```
+```{r}
+```
 
 
 ```{r}
@@ -71,5 +79,8 @@ names(complete_data)
 ```
 
 
+```{r}
+
+```
 
 
