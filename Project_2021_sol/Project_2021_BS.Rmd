@@ -68,12 +68,12 @@ print.table(na_percent)
 ```{r}
 library(tidyverse)
 complete_data$duration <- as.numeric(complete_data$duration)
-ggplot(complete_data, aes(x = duration)) +  geom_density()+
-  geom_histogram(fill = 'blue', binwidth = 50, alpha = 1)  + 
+ggplot(complete_data, aes(x = duration)) +
+  geom_histogram(fill = 'steelblue', binwidth = 50, alpha = 1)  + 
   theme(plot.title = element_text(hjust = 0.5)) + 
-  labs(title = 'Rerésentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
+  labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
   scale_y_continuous(n.breaks = 15) +
-  scale_x_continuous(n.breaks = 10)
+  scale_x_continuous(n.breaks = 20)
 ```
 ### 4. Compter le nombre de films dans lesquels la langue française apparait.
 
@@ -106,14 +106,15 @@ complete_data$year <- complete_data$year %>%
   as.numeric %>% 
   #replace the NA value with 2019
   replace_na(., 2019)
-#show unique value of recently create year column
+#show unique value of recently created year column
 unique(complete_data$year)
 ```
 
 ```{r}
 #creation of the "decade variable"
 complete_data$decade <- cut(complete_data$year, 
-                            breaks = c(seq(min(complete_data$year), max(complete_data$year) + 10, 10)),
+                            breaks = c(seq(min(complete_data$year), 
+                                           max(complete_data$year) + 10, 10)),
                             labels = c("1894 - 1903",
                                        "1904 - 1913",
                                        "1914 - 1923",
@@ -136,18 +137,46 @@ complete_data %>%
   sample_n(50)
 ```
 
-
+### 6. Proposer une représentation graphique permettant d’observer pour chaque décennie, le nombre et la proportion de films dans lesquels la langue française apparait.
 
 
 ```{r}
-(j-i)/10
-i <- min(complete_data$year)
-j <- max(complete_data$year)
-a <- seq(i, j+10, 10)
-length(a)
+
+complete_data %>%
+  select(language, decade) %>% 
+  group_by(decade) %>% 
+  count(french = str_detect(language, "French|.French.")) %>% 
+  mutate(p = n / sum(n)) %>% 
+  filter(french == T) %>%
+  ggplot(aes(y = decade, label = p)) + 
+  geom_bar(aes(weight = n), fill = "steelblue") +
+  theme(plot.title = element_text(hjust = .5)) + 
+  labs(title = "Représentation de la quantité de films \n dans lesquels la langue française apparait par décenie",
+       x = "Effectif", y = "Décennie")
+  # geom_text(aes(label=decade), hjust=1.6, color="white", size=3.5)
+# label des bars a ajouter
 ```
 
+```{r}
 
+complete_data %>%
+  select(language, decade) %>% 
+  group_by(decade) %>% 
+  count(french = str_detect(language, "French|.French.")) %>% 
+  mutate(p = n / sum(n)) %>% 
+  filter(french == T) %>%
+  ggplot(aes(y = decade, label = p)) + 
+  geom_bar(aes(weight = p), fill = "steelblue")+
+  scale_x_continuous(labels = scales::percent) +
+  theme(plot.title = element_text(hjust = .5)) + 
+  labs(title = "Représentation de la proportion de films \n dans lesquels la langue française apparait par décenie",x = "Pourcentage", y = "Décennie")
+```
+### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
+
+
+```{r}
+names(complete_data)
+```
 
 
 ```{r}
