@@ -1,6 +1,6 @@
 ---
 title: "Project 2021"
-author: "Berthony Sully"
+author: "Berthony Sully & Landy Clément"
 date: "9/16/2021"
 output:
   html_document:
@@ -12,7 +12,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ### 1.Proposer un code permettant de regrouper les données contenues dans movies.zip dans un seul et même data.frame.
-landy
 ```{r, message = FALSE} 
 #Attach the necessary libraries
 library(dplyr)
