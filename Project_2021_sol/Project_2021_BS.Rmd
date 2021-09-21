@@ -173,6 +173,14 @@ complete_data %>%
 ```
 ### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
 
+```{r}
+
+```
+
+
+
+
+
 
 ```{r}
 names(complete_data)
