@@ -77,7 +77,7 @@ na_num <- complete_data %>%
 print.table(na_num)
 ```
 ```{r}
-#  Presentage of missng values
+#  Percentage of missing values
 na_percent <- round(na_num/sum(is.na(complete_data) * 100), 3)
 
 print.table(na_percent)
