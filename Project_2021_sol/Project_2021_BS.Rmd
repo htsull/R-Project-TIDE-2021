@@ -179,7 +179,7 @@ complete_data %>%
   theme(plot.title = element_text(hjust = .5)) + 
   labs(title = "Représentation de la quantité de films /n dans lesquels la langue française apparait par décenie",
        x = "Effectif", y = "Décennie")
-  # geom_text(aes(label=decade), hjust=1.6, color="white", size=3.5)
+  # geom_text(aes(label = paste0(round(hist(df$n, plot = FALSE)$counts / length(df) * 100, 1), "%")), hjust=1.6, color="white", size=3.5)
 # label des bars a ajouter
 ```
 
@@ -197,20 +197,68 @@ complete_data %>%
   theme(plot.title = element_text(hjust = .5)) + 
   labs(title = "Représentation de la proportion de films /n dans lesquels la langue française apparait par décenie",x = "Pourcentage", y = "Décennie")
 ```
+
 ### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
 
-```{r}
-
-```
-
-
-
-
 
 
 ```{r}
-names(complete_data)
+library(dplyr)
+group_by(my_data, Species) %>% 
+summarise(
+  count = n(), 
+  mean = mean(Sepal.Length, na.rm = TRUE),
+  sd = sd(Sepal.Length, na.rm = TRUE)
+  )
 ```
+
+```{r}
+data <-complete_data %>% 
+  select(starts_with("avg_vote"))
+
+report <- function(x, name) { 
+  tibble(
+    variable  = name, 
+    mean = mean(x, na.rm = FALSE),
+    median = median(x, na.rm = FALSE),
+    sd = sd(x),
+    mad = mad(x, center = median(x), constant = 1.4826, na.rm = FALSE,
+    low = FALSE, high = FALSE),
+    coef_de_var = (sd(x)/mean(x))*100,
+    max = max(x),
+    min   = min(x)
+  )
+}
+
+data %>% imap_dfr(report)
+```
+
+#### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
+
+complete_data$avg_vote
+
+```{r}
+dt_cor <- complete_data %>% 
+  group_by(year) %>% 
+  summarise(cor = cor(votes, genre,
+                      use = "complete.obs"))
+
+ggplot(complete_data, aes(x = votes,
+               y = genre,
+               color = year)) +
+  geom_point(size = 2) +
+  geom_smooth(method = "lm", se = F) +
+  geom_label(data = dt_cor,
+             aes(label = paste("cor:", round(cor, 2)),
+                 x = Inf,
+                 y = 3,
+                 hjust = 1.2)) +
+  facet_wrap(~ year, scales = "free") +
+  theme(legend.position = "none") +
+  labs(x = "votes", y = "genre")
+```
+
+
 
 
 ```{r}
