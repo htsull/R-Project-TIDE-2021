@@ -1,6 +1,6 @@
 ---
 title: "Project 2021 TIDE"
-author: "Berthony Sully & Landy Clément 2.0"
+author: "Berthony Sully & Landy Clément"
 date: "9/16/2021"
 output:
   html_document:
