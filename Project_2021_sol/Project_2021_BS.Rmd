@@ -166,42 +166,28 @@ complete_data %>%
 ### 6. Proposer une représentation graphique permettant d’observer pour chaque décennie, le nombre et la proportion de films dans lesquels la langue française apparait.
 
 ```{r}
-
-complete_data %>%
+dt <- complete_data %>%
   select(language, decade) %>% 
   group_by(decade) %>% 
   count(french = str_detect(language, "French|.French.")) %>% 
-  mutate(p = n / sum(n)) %>% 
-  filter(french == T) %>%
-  ggplot(aes(y = decade, label = p)) + 
-  geom_bar(aes(weight = n), fill = "steelblue") +
-  theme(plot.title = element_text(hjust = .5)) + 
-  labs(title = "Représentation de la quantité de films /n dans lesquels la langue française apparait par décenie",
-       x = "Effectif", y = "Décennie")
-  # geom_text(aes(label = paste0(round(hist(df$n, plot = FALSE)$counts / length(df) * 100, 1), "%")), hjust=1.6, color="white", size=3.5)*
+  mutate(p = scales::percent(n / sum(n))) %>% 
+  filter(french == T)
+  
+ggplot(dt, aes(x=decade,y=n, fill=decade)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=p), vjust=-0.3, size=3.5)+
+  theme_minimal() + 
+  labs(title = "Représentation de la quantité de films dans lesquels la langue française apparait par décenie",
+       x = "Décennie", y = "Effectif")
+
 ```
 
-```{r}
-
-complete_data %>%
-  select(language, decade) %>% 
-  group_by(decade) %>% 
-  count(french = str_detect(language, "French|.French.")) %>% 
-  mutate(p = n / sum(n)) %>% 
-  filter(french == T) %>%
-  ggplot(aes(y = decade, label = p)) + 
-  geom_bar(aes(weight = p), fill = "steelblue")+
-  scale_x_continuous(labels = scales::percent) +
-  theme(plot.title = element_text(hjust = .5)) + 
-  labs(title = "Représentation de la proportion de films /n dans lesquels la langue française apparait par décenie",x = "Pourcentage", y = "Décennie")
-```
 
 ### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
 
-
 ```{r}
 data <-complete_data %>% 
-  select(starts_with("avg_vote"))
+  select(starts_with("avg_vote_"))
 
 report <- function(x, name) { 
   tibble(
@@ -218,74 +204,66 @@ report <- function(x, name) {
 }
 
 Ind_Stat <- data %>% imap_dfr(report)
+Ind_Stat
 ```
+
+#### Représentez graphiquement ces résultats
 
 ```{r}
 library(ggplot2)
-ggplot(Ind_Stat, aes(x=variable, y=mean, fill=variable)) +
+moy <- ggplot(Ind_Stat, aes(x=variable, y=mean, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=mean), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-ggplot(Ind_Stat, aes(x=variable, y=median, fill=variable)) +
+med <- ggplot(Ind_Stat, aes(x=variable, y=median, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=median), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-ggplot(Ind_Stat, aes(x=variable, y=sd, fill=variable)) +
+sd <- ggplot(Ind_Stat, aes(x=variable, y=sd, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=sd), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-ggplot(Ind_Stat, aes(x=variable, y=mad, fill=variable)) +
+mad <- ggplot(Ind_Stat, aes(x=variable, y=mad, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=mad), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-ggplot(Ind_Stat, aes(x=variable, y=coef_de_var, fill=variable)) +
+cv <- ggplot(Ind_Stat, aes(x=variable, y=coef_de_var, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=coef_de_var), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-ggplot(Ind_Stat, aes(x=variable, y=max, fill=variable)) +
+max <- ggplot(Ind_Stat, aes(x=variable, y=max, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=max), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
+min <- ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=min), vjust=-0.3, size=3.5)+
   theme_minimal()
-```
-```{r}
-library(reshape)
-row.names(Ind_Stat) <- c("avg_vote","avg_vote_10","avg_vote_100",  "avg_vote_1000")
 
-Ind_Stat$category <- row.names(Ind_Stat)
-mInd_Stat <- melt(Ind_Stat, id.vars = "category")
-
-library(scales)
-(p <- ggplot(mInd_Stat, aes(category, value, fill = variable)) +
-    geom_bar(position = "fill", stat = "identity") +
-    scale_y_continuous(labels = percent)
-)
+library(cowplot)
+plot_grid(moy, med, sd, mad, cv, max, min, labels = c("Moy", "Med",
+                                                      "Sd", "Mad", "cv", "max", "min"), label_size = 14, hjust = -0.5, vjust =1.5, greedy = TRUE, byrow = T)
 ```
 
  
  
 #### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
 
-complete_data$avg_vote
-
 ```{r}
-dt_cor <- complete_data %>% 
-  group_by(year) %>% 
-  summarise(cor = cor(votes, genre,
+dt_cor <- names(complete_data) %>% 
+  group_by(genre) %>% 
+  summarise(cor = cor(note_exam, note_projet,
                       use = "complete.obs"))
 
-ggplot(complete_data, aes(x = votes,
-               y = genre,
-               color = year)) +
+ggplot(dt, aes(x = note_exam,
+               y = note_projet,
+               color = year_promo)) +
   geom_point(size = 2) +
   geom_smooth(method = "lm", se = F) +
   geom_label(data = dt_cor,
@@ -293,9 +271,9 @@ ggplot(complete_data, aes(x = votes,
                  x = Inf,
                  y = 3,
                  hjust = 1.2)) +
-  facet_wrap(~ year, scales = "free") +
+  facet_wrap(~ year_promo, scales = "free") +
   theme(legend.position = "none") +
-  labs(x = "votes", y = "genre")
+  labs(x = "Note examen", y = "Note projet")
 ```
 
 
