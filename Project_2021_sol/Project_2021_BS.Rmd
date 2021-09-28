@@ -255,32 +255,47 @@ plot_grid(moy, med, sd, mad, cv, max, min, labels = c("Moy", "Med",
  
 #### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
 
+#### Tout d’abord il est intéressant de les représenter graphiquements au moyen de boîtes à moustaches côte à côte, pour mieux comparer les dispersions des chaques modalités de la variable qualitative(genre).
+
+
 ```{r}
-dt_cor <- names(complete_data) %>% 
+ggplot(complete_data, aes(x=genre, y=votes))+
+  geom_boxplot(fill="lightblue")
+
+# ou bien
+boxplot(complete_data$votes ~ complete_data$genre,
+col = "purple", border = "black",
+main = "Votes en fonction du genre de cinema",
+xlab = "Genre",
+ylab = "Votes"
+)
+
+```
+
+### Pour décrire le lien entre une variable catégorielle et une variable quantitative, on peut calculer certaines caractéristiques de la variable quantitative (par exemple sa moyenne) par groupe (défini par les modalités de la variable catégorielle). Pour cela, la fonction summarise() du package dplyr est tout indiquée:
+
+```{r}
+complete_data %>% 
   group_by(genre) %>% 
-  summarise(cor = cor(note_exam, note_projet,
-                      use = "complete.obs"))
-
-ggplot(dt, aes(x = note_exam,
-               y = note_projet,
-               color = year_promo)) +
-  geom_point(size = 2) +
-  geom_smooth(method = "lm", se = F) +
-  geom_label(data = dt_cor,
-             aes(label = paste("cor:", round(cor, 2)),
-                 x = Inf,
-                 y = 3,
-                 hjust = 1.2)) +
-  facet_wrap(~ year_promo, scales = "free") +
-  theme(legend.position = "none") +
-  labs(x = "Note examen", y = "Note projet")
+  summarise(moy_votes=mean(votes),
+            max_votes=max(votes),
+            min_votes=min(votes),
+            sd_votes=sd(votes))
 ```
-
-
-
 
 ```{r}
-unique(complete_data$year)
+t.test(iris_versicolor$Petal.Length,iris_setosa$Petal.Length)
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 
