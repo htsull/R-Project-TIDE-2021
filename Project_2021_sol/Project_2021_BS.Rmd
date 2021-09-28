@@ -165,7 +165,6 @@ complete_data %>%
 
 ### 6. Proposer une représentation graphique permettant d’observer pour chaque décennie, le nombre et la proportion de films dans lesquels la langue française apparait.
 
-
 ```{r}
 
 complete_data %>%
@@ -179,8 +178,7 @@ complete_data %>%
   theme(plot.title = element_text(hjust = .5)) + 
   labs(title = "Représentation de la quantité de films /n dans lesquels la langue française apparait par décenie",
        x = "Effectif", y = "Décennie")
-  # geom_text(aes(label = paste0(round(hist(df$n, plot = FALSE)$counts / length(df) * 100, 1), "%")), hjust=1.6, color="white", size=3.5)
-# label des bars a ajouter
+  # geom_text(aes(label = paste0(round(hist(df$n, plot = FALSE)$counts / length(df) * 100, 1), "%")), hjust=1.6, color="white", size=3.5)*
 ```
 
 ```{r}
@@ -201,17 +199,6 @@ complete_data %>%
 ### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
 
 
-
-```{r}
-library(dplyr)
-group_by(my_data, Species) %>% 
-summarise(
-  count = n(), 
-  mean = mean(Sepal.Length, na.rm = TRUE),
-  sd = sd(Sepal.Length, na.rm = TRUE)
-  )
-```
-
 ```{r}
 data <-complete_data %>% 
   select(starts_with("avg_vote"))
@@ -219,20 +206,73 @@ data <-complete_data %>%
 report <- function(x, name) { 
   tibble(
     variable  = name, 
-    mean = mean(x, na.rm = FALSE),
-    median = median(x, na.rm = FALSE),
-    sd = sd(x),
-    mad = mad(x, center = median(x), constant = 1.4826, na.rm = FALSE,
-    low = FALSE, high = FALSE),
-    coef_de_var = (sd(x)/mean(x))*100,
-    max = max(x),
-    min   = min(x)
+    mean = round(mean(x, na.rm = FALSE), 2),
+    median = round(median(x, na.rm = FALSE), 2),
+    sd = round(sd(x), 2),
+    mad = round(mad(x, center = median(x), constant = 1.4826, na.rm = FALSE,
+    low = FALSE, high = FALSE), 2),
+    coef_de_var = round((sd(x)/mean(x))*100, 2),
+    max = round(max(x), 2),
+    min = round(min(x), 2)
   )
 }
 
-data %>% imap_dfr(report)
+Ind_Stat <- data %>% imap_dfr(report)
 ```
 
+```{r}
+library(ggplot2)
+ggplot(Ind_Stat, aes(x=variable, y=mean, fill=variable)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=mean), vjust=-0.3, size=3.5)+
+  theme_minimal()
+
+ggplot(Ind_Stat, aes(x=variable, y=median, fill=variable)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=median), vjust=-0.3, size=3.5)+
+  theme_minimal()
+
+ggplot(Ind_Stat, aes(x=variable, y=sd, fill=variable)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=sd), vjust=-0.3, size=3.5)+
+  theme_minimal()
+
+ggplot(Ind_Stat, aes(x=variable, y=mad, fill=variable)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=mad), vjust=-0.3, size=3.5)+
+  theme_minimal()
+
+ggplot(Ind_Stat, aes(x=variable, y=coef_de_var, fill=variable)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=coef_de_var), vjust=-0.3, size=3.5)+
+  theme_minimal()
+
+ggplot(Ind_Stat, aes(x=variable, y=max, fill=variable)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=max), vjust=-0.3, size=3.5)+
+  theme_minimal()
+
+ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
+  geom_bar(stat="identity", color="black")+
+  geom_text(aes(label=min), vjust=-0.3, size=3.5)+
+  theme_minimal()
+```
+```{r}
+library(reshape)
+row.names(Ind_Stat) <- c("avg_vote","avg_vote_10","avg_vote_100",  "avg_vote_1000")
+
+Ind_Stat$category <- row.names(Ind_Stat)
+mInd_Stat <- melt(Ind_Stat, id.vars = "category")
+
+library(scales)
+(p <- ggplot(mInd_Stat, aes(category, value, fill = variable)) +
+    geom_bar(position = "fill", stat = "identity") +
+    scale_y_continuous(labels = percent)
+)
+```
+
+ 
+ 
 #### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
 
 complete_data$avg_vote
