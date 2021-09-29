@@ -18,13 +18,13 @@ library(dplyr)
 library(readr)
 
 #1. Capture the raw pat of the zip folder
-raw_path <- "C:/Users/cleme/Desktop/Projet_m2_tide/aaaaa/R-Project-TIDE-2021/Project_2021_sol/movies.zip"
+raw_path <- "C:/Users/bsully/OneDrive - Université Paris 1 Panthéon-Sorbonne/Documents/GitHub/R-Project-TIDE-2021/Project_2021_sol/movies.zip"
 
 #2. unzip the folder
 data <- unzip(raw_path, files = NULL, list = F, exdir = "movie_unzip")
 
 #3. Capture the new path to the folder that contains the datasets
-path_ <- "C:/Users/cleme/Documents/GitHub/R-Project-TIDE-2021/Project_2021_sol/movie_unzip"
+path_ <- "C:/Users/bsully/OneDrive - Université Paris 1 Panthéon-Sorbonne/Documents/GitHub/R-Project-TIDE-2021/Project_2021_sol/movie_unzip"
 
 #4. Create a function to merge all the datasets
 merge_df = function(path_to_folder){
@@ -94,7 +94,7 @@ round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 3)
 library(tidyverse)
 complete_data$duration <- as.numeric(complete_data$duration)
 ggplot(complete_data, aes(x = duration)) +
-  geom_histogram(color = "red", fill = 'green', binwidth = 50, alpha = 1)  + 
+  geom_histogram(color = "blue", fill = 'steelblue', binwidth = 50, alpha = 1)  + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
   scale_y_continuous(n.breaks = 15) +
@@ -264,5 +264,5 @@ ggplot(complete_data, aes(x = votes,
 ```{r}
 unique(complete_data$year)
 ```
-
+`
 

@@ -1,0 +1,244 @@
+---
+title: "Project 2021 TIDE"
+author: "Berthony Sully & Landy Clément"
+date: "9/16/2021"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+### 1.Proposer un code permettant de regrouper les données contenues dans movies.zip dans un seul et même data.frame.
+```{r, message = FALSE} 
+#Attach the necessary libraries
+library(dplyr)
+library(readr)
+
+#1. Capture the raw pat of the zip folder
+raw_path <- "C:/Users/bsully/OneDrive - Université Paris 1 Panthéon-Sorbonne/Documents/GitHub/R-Project-TIDE-2021/Project_2021_sol/movies.zip"
+
+#2. unzip the folder
+data <- unzip(raw_path, files = NULL, list = F, exdir = "movie_unzip")
+
+#3. Capture the new path to the folder that contains the datasets
+path_ <- "C:/Users/bsully/OneDrive - Université Paris 1 Panthéon-Sorbonne/Documents/GitHub/R-Project-TIDE-2021/Project_2021_sol/movie_unzip"
+
+#4. Create a function to merge all the datasets
+merge_df = function(path_to_folder){
+
+  #capture the names of the files in the folder
+  list_name_file = list.files(path = path_to_folder, full.names = T)
+  
+  #read all the files in the folder
+  data_list = lapply(list_name_file, function(x){
+    read.csv(file = x, header = TRUE)
+    }) #x --> names of the files to read (in this case 'list_name_file')
+  
+  #combine the datasets with the reduce function 
+  #after merging them two by two (merge function)
+  Reduce(function(x, y){merge(x, y, all = T)}, data_list)
+}
+
+#5. Store the complete merged dataset
+complete_data <- merge_df(path_)
+```
+
+### 2. Observer pour chaque variable, le nombre et la proportion de valeurs manquantes.
+
+```{r, message=FALSE}
+# Number of missing values
+na_num <- complete_data %>% 
+  summarise_all(funs(sum(is.na(.))))
+
+print.table(na_num)
+```
+```{r}
+#  Presentage of missng values
+na_percent <- round(na_num/sum(is.na(complete_data) * 100), 3)
+
+print.table(na_percent)
+```
+#### Nous constatons que la variable Country ne contient pas de NA. Cependant, ladite variavle et d'autres ont des cases vides. Ainsi, nous avons  décidé de les gérer comme des NAs.
+
+```{r}
+complete_data[complete_data == ""]<- NA # Remplacer les vides par des NAs.
+```
+
+### 2.1. Observons à nouveau pour chaque variable, le nombre et la proportion de valeurs manquantes.
+
+```{r, message=FALSE}
+# Number of missing values
+na_num <- complete_data %>% 
+  summarise_all(funs(sum(is.na(.))))
+
+print.table(na_num)
+```
+```{r}
+#  Percentage of missing values
+na_percent <- round(na_num/sum(is.na(complete_data) * 100), 3)
+
+print.table(na_percent)
+```
+
+#### J'aurais préféré ce code pour le pourcentage au lieu de celui que t'as utilisé. L'autre n'affiche pas tous les pourcentages
+```{r}
+round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 3)
+```
+
+### 3. Représenter graphiquement la distribution de la durée des films
+
+```{r}
+library(tidyverse)
+complete_data$duration <- as.numeric(complete_data$duration)
+ggplot(complete_data, aes(x = duration)) +
+  geom_histogram(color = "blue", fill = 'steelblue', binwidth = 50, alpha = 1)  + 
+  theme(plot.title = element_text(hjust = 0.5)) + 
+  labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
+  scale_y_continuous(n.breaks = 15) +
+  scale_x_continuous(n.breaks = 20)
+```
+### 4. Compter le nombre de films dans lesquels la langue française apparait.
+
+```{r}
+library(stringr)
+complete_data %>% 
+  filter(str_detect(language, "French|.French.")) %>% 
+  select(language) %>% 
+  count() %>% 
+  paste(.,'films sont disponibles en francais')
+```
+
+### 5. Créer une variable permettant de discrétiser la variable year par décennie (ex : 1975 => Entre 1970 et 1980, 1995 => Entre 1990 et 2000, 2001 => Entre 2000 et 2010…)
+
+```{r}
+paste("La variable Year est de type :", typeof(complete_data$year))
+```
+#### On peut essayer de voir les valeurs uniques de year pour avoir une plus nette explication
+```{r}
+unique(complete_data$year)
+```
+#### La valeur "TV Movie 2019" semble être le probleme. Pour cela, étant donné qu'on connait le contexe on peut remplacer cette valeur par "2019" et convertir la variable au type 'numeric.
+
+
+```{r, message=FALSE, warning=FALSE}
+# Select year column
+complete_data$year <- complete_data$year %>% 
+  #convert as numeric type
+  as.numeric %>% 
+  #replace the NA value with 2019
+  replace_na(., 2019)
+#show unique value of recently created year column
+unique(complete_data$year)
+```
+                                  
+
+```{r}
+#creation of the "decade variable"
+complete_data$decade <- cut(complete_data$year, 
+                            breaks = c(seq(1890, 
+                                           2020, 10)),
+                            labels = c("1890 - 1900",
+                                       "1900 - 1910",
+                                       "1910 - 1920",
+                                       "1920 - 1930",
+                                       "1930 - 1940",
+                                       "1940 - 1950",
+                                       "1950 - 1960",
+                                       "1960 - 1970",
+                                       "1970 - 1980",
+                                       "1980 - 1990",
+                                       "1990 - 2000",
+                                       "2000 - 2010",
+                                       "2010 - 2020"),
+                            right = F,
+                            include.lowest = T)
+
+#randomly select some line in year and decade columns to verify the results
+complete_data %>% 
+  select(year, decade)%>% 
+  sample_n(50)
+```
+```{r}
+write.csv(complete_data, file = "shiny_data.csv", sep = ",")
+```
+
+
+
+### 6. Proposer une représentation graphique permettant d’observer pour chaque décennie, le nombre et la proportion de films dans lesquels la langue française apparait.
+
+
+```{r}
+
+complete_data %>%
+  select(language, decade) %>% 
+  group_by(decade) %>% 
+  count(french = str_detect(language, "French|.French.")) %>% 
+  mutate(p = n / sum(n)) %>% 
+  filter(french == T) %>%
+  ggplot(aes(y = decade, label = p)) + 
+  geom_bar(aes(weight = n), fill = "steelblue") +
+  theme(plot.title = element_text(hjust = .5)) + 
+  labs(title = "Représentation de la quantité de films /n dans lesquels la langue française apparait par décenie",
+       x = "Effectif", y = "Décennie")
+  # geom_text(aes(label=decade), hjust=1.6, color="white", size=3.5)
+# label des bars a ajouter
+```
+
+```{r}
+
+complete_data %>%
+  select(language, decade) %>% 
+  group_by(decade) %>% 
+  count(french = str_detect(language, "French|.French.")) %>% 
+  mutate(p = n / sum(n)) %>% 
+  filter(french == T) %>%
+  ggplot(aes(y = decade, label = p)) + 
+  geom_bar(aes(weight = p), fill = "steelblue")+
+  scale_x_continuous(labels = scales::percent) +
+  theme(plot.title = element_text(hjust = .5)) + 
+  labs(title = "Représentation de la proportion de films /n dans lesquels la langue française apparait par décenie",x = "Pourcentage", y = "Décennie")
+```
+### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
+
+```{r}
+
+```
+
+
+
+
+
+
+```{r}
+names(complete_data)
+```
+
+
+```{r}
+lst <- as.list(unique(complete_data$actors))
+
+actors_ <- paste(lst, collapse = '')
+
+act_lst <- strsplit(actors_, ",")
+
+act_lst %>% length()
+
+```
+
+```{r}
+lst <- unique(complete_data$actors)
+
+actors_ <- paste(lst, collapse = '')
+
+act_lst <- strsplit(actors_, ",")
+
+act_lst[[1]] %>% unique %>% length()
+finLst <- unlist(act_lst, recursive = T)
+```
+
+
+`
+
