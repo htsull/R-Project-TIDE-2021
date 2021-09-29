@@ -3,7 +3,7 @@
     "path": "~/GitHub/R-Project-TIDE-2021/Project_2021_sol/Shiny_app/global.R",
     "project_path": "global.R",
     "type": "r_source",
-    "hash": "0",
+    "hash": "2635352386",
     "contents": "",
     "dirty": false,
     "created": 1632828731985.0,
@@ -16,11 +16,11 @@
         "scrollLine": "0"
     },
     "folds": "",
-    "lastKnownWriteTime": 1632849602,
+    "lastKnownWriteTime": 1632874094,
     "encoding": "UTF-8",
     "collab_server": "",
     "source_window": "",
-    "last_content_update": 1632849602506,
+    "last_content_update": 1632874094053,
     "read_only": false,
     "read_only_alternatives": []
 }
