@@ -18,13 +18,13 @@ library(dplyr)
 library(readr)
 
 #1. Capture the raw pat of the zip folder
-raw_path <- "C:/Users/cleme/Desktop/Projet_m2_tide/aaaaa/R-Project-TIDE-2021/Project_2021_sol/movies.zip"
+raw_path <- "./movies.zip"
 
 #2. unzip the folder
 data <- unzip(raw_path, files = NULL, list = F, exdir = "movie_unzip")
 
 #3. Capture the new path to the folder that contains the datasets
-path_ <- "C:/Users/cleme/Documents/GitHub/R-Project-TIDE-2021/Project_2021_sol/movie_unzip"
+path_ <- "./movie_unzip"
 
 #4. Create a function to merge all the datasets
 merge_df = function(path_to_folder){
@@ -43,7 +43,12 @@ merge_df = function(path_to_folder){
 }
 
 #5. Store the complete merged dataset
-complete_data <- merge_df(path_)
+# df <- merge_df(path_)
+
+# write.csv(x = df, file = "complete_data.csv")
+
+complete_data <- read.csv(file = "./complete_data.csv", header = T)
+
 ```
 
 ### 2. Observer pour chaque variable, le nombre et la proportion de valeurs manquantes.
@@ -78,14 +83,7 @@ print.table(na_num)
 ```
 ```{r}
 #  Presentage of missng values
-na_percent <- round(na_num/sum(is.na(complete_data) * 100), 3)
-
-print.table(na_percent)
-```
-
-#### J'aurais préféré ce code pour le pourcentage au lieu de celui que t'as utilisé. L'autre n'affiche pas tous les pourcentages
-```{r}
-round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 3)
+round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
 ```
 
 ### 3. Représenter graphiquement la distribution de la durée des films
@@ -111,6 +109,7 @@ complete_data %>%
   paste(.,'films sont disponibles en francais')
 ```
 
+
 ### 5. Créer une variable permettant de discrétiser la variable year par décennie (ex : 1975 => Entre 1970 et 1980, 1995 => Entre 1990 et 2000, 2001 => Entre 2000 et 2010…)
 
 ```{r}
@@ -133,7 +132,7 @@ complete_data$year <- complete_data$year %>%
 #show unique value of recently created year column
 unique(complete_data$year)
 ```
-                                  
+
 
 ```{r}
 #creation of the "decade variable"
@@ -176,7 +175,7 @@ dt <- complete_data %>%
 ggplot(dt, aes(x=decade,y=n, fill=decade)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=p), vjust=-0.3, size=3.5)+
-  theme_minimal() + 
+  theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1)) + 
   labs(title = "Représentation de la quantité de films dans lesquels la langue française apparait par décenie",
        x = "Décennie", y = "Effectif")
 
@@ -195,8 +194,11 @@ report <- function(x, name) {
     mean = round(mean(x, na.rm = FALSE), 2),
     median = round(median(x, na.rm = FALSE), 2),
     sd = round(sd(x), 2),
-    mad = round(mad(x, center = median(x), constant = 1.4826, na.rm = FALSE,
-    low = FALSE, high = FALSE), 2),
+    
+    mad = round(mad(x, center = median(x), 
+                    constant = 1.4826, na.rm = FALSE,
+                    low = FALSE, high = FALSE), 2),
+    
     coef_de_var = round((sd(x)/mean(x))*100, 2),
     max = round(max(x), 2),
     min = round(min(x), 2)
@@ -206,50 +208,51 @@ report <- function(x, name) {
 Ind_Stat <- data %>% imap_dfr(report)
 Ind_Stat
 ```
+#### Vu que les variables avg_vote et avg_vote_10 sont identiques, on a décidé de garder que la variable avg_vote_10.
 
 #### Représentez graphiquement ces résultats
 
 ```{r}
-library(ggplot2)
-moy <- ggplot(Ind_Stat, aes(x=variable, y=mean, fill=variable)) +
+ggplot(Ind_Stat, aes(x=variable, y=mean, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=mean), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-med <- ggplot(Ind_Stat, aes(x=variable, y=median, fill=variable)) +
+ggplot(Ind_Stat, aes(x=variable, y=median, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=median), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-sd <- ggplot(Ind_Stat, aes(x=variable, y=sd, fill=variable)) +
+ggplot(Ind_Stat, aes(x=variable, y=sd, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=sd), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-mad <- ggplot(Ind_Stat, aes(x=variable, y=mad, fill=variable)) +
+ggplot(Ind_Stat, aes(x=variable, y=mad, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=mad), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-cv <- ggplot(Ind_Stat, aes(x=variable, y=coef_de_var, fill=variable)) +
+ggplot(Ind_Stat, aes(x=variable, y=coef_de_var, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=coef_de_var), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-max <- ggplot(Ind_Stat, aes(x=variable, y=max, fill=variable)) +
+ggplot(Ind_Stat, aes(x=variable, y=max, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=max), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-min <- ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
+ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=min), vjust=-0.3, size=3.5)+
   theme_minimal()
 
-library(cowplot)
-plot_grid(moy, med, sd, mad, cv, max, min, labels = c("Moy", "Med",
-                                                      "Sd", "Mad", "cv", "max", "min"), label_size = 14, hjust = -0.5, vjust =1.5, greedy = TRUE, byrow = T)
+# library(cowplot)
+# plot_grid(moy, med, sd, mad, cv, max, min, labels = c("Moy", "Med",
+#                                                       "Sd", "Mad", "cv", "max", "min"), label_size = 14, hjust = -0.5, vjust =1.5, greedy = TRUE, byrow = T)
 ```
+
 
  
  
@@ -259,18 +262,20 @@ plot_grid(moy, med, sd, mad, cv, max, min, labels = c("Moy", "Med",
 
 
 ```{r}
-ggplot(complete_data, aes(x=genre, y=votes))+
-  geom_boxplot(fill="lightblue")
-
-# ou bien
-boxplot(complete_data$votes ~ complete_data$genre,
-col = "purple", border = "black",
-main = "Votes en fonction du genre de cinema",
-xlab = "Genre",
-ylab = "Votes"
-)
-
+ggplot(complete_data, mapping = aes(x=genre, y=votes))+
+  geom_boxplot()
 ```
+
+
+```{r}
+ggplot(complete_data) +
+  aes(x=genre, y=votes, fill="genre", colour="genre") +
+  geom_boxplot() +
+  xlab("Genre du cinéma") +
+  ylab("Votes") +
+  ggtitle("Répartition de notation en fonction du genre de film")
+```
+
 
 ### Pour décrire le lien entre une variable catégorielle et une variable quantitative, on peut calculer certaines caractéristiques de la variable quantitative (par exemple sa moyenne) par groupe (défini par les modalités de la variable catégorielle). Pour cela, la fonction summarise() du package dplyr est tout indiquée:
 
@@ -283,13 +288,56 @@ complete_data %>%
             sd_votes=sd(votes))
 ```
 
+#### 9) Pour chaque genre de film, représenter graphiquement le top 10 des films les mieux notés
+
 ```{r}
-t.test(iris_versicolor$Petal.Length,iris_setosa$Petal.Length)
+View(table(complete_data$genre))
+```
+
+```{r}
+top_10_film <- complete_data %>% 
+  select(votes, genre) %>%
+  arrange(desc(votes)) %>% 
+  head(10)
+
+complete_data %>% select(genre) %>% unique()
+
+uniGenre <- function(vect_){
+    genre1 <- vect_
+    genre2 <- paste0(genre1, collapse = ',')
+    genre3 <- strsplit(genre2, ",")
+    genre4 <- genre3[[1]] %>% unique %>% sort
+    return(genre4)
+}
+
+fon <- uniGenre(complete_data$genre)
+
+complete_data$original_title[grepl('Action', complete_data$genre)] %>% length()
+
+for i in fon{
+  complete_data$genre[grepl(i, complete_data$genre)] %>% length()
+}
+
+
+
+
+
+complete_data$
+top_10_film %>%
+  select(votes, genre)
+  
+  ggplot(top_10_film, aes(x=genre,y=votes, fill=genre)) +
+  geom_bar(stat="identity", color="black")+
+  theme_minimal() + 
+  labs(title = "représenter graphiquement le top 10 des films les mieux notés",
+       x = "Genre", y = "Nbre_de_votes")
 ```
 
 
 
-
+```{r}
+typeof(complete_data$votes)
+```
 
 
 
