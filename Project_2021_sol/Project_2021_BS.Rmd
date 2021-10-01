@@ -53,13 +53,6 @@ complete_data <- read.csv(file = "./complete_data.csv", header = T)
 
 ### 2. Observer pour chaque variable, le nombre et la proportion de valeurs manquantes.
 
-```{r, message=FALSE}
-# Number of missing values
-na_num <- complete_data %>% 
-  summarise_all(funs(sum(is.na(.))))
-
-print.table(na_num)
-```
 ```{r}
 #  Presentage of missng values
 na_percent <- round(na_num/sum(is.na(complete_data) * 100), 3)
@@ -74,13 +67,6 @@ complete_data[complete_data == ""]<- NA # Remplacer les vides par des NAs.
 
 ### 2.1. Observons à nouveau pour chaque variable, le nombre et la proportion de valeurs manquantes.
 
-```{r, message=FALSE}
-# Number of missing values
-na_num <- complete_data %>% 
-  summarise_all(funs(sum(is.na(.))))
-
-print.table(na_num)
-```
 ```{r}
 #  Presentage of missng values
 round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
@@ -269,11 +255,13 @@ ggplot(complete_data, mapping = aes(x=genre, y=votes))+
 
 ```{r}
 ggplot(complete_data) +
-  aes(x=genre, y=votes, fill="genre", colour="genre") +
-  geom_boxplot() +
-  xlab("Genre du cinéma") +
-  ylab("Votes") +
+  aes(x=genre, y=votes,  colour="green") +
+  geom_boxplot() + 
+    guides(scale="none") + coord_flip()
+  xlab("Votes") +
+  ylab("Genre") +
   ggtitle("Répartition de notation en fonction du genre de film")
+# facet_wrap(~genre)
 ```
 
 
