@@ -70,6 +70,8 @@ complete_data[complete_data == ""]<- NA # Remplacer les vides par des NAs.
 ```{r}
 #  Presentage of missng values
 round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
+
+print.table(na_percent)
 ```
 
 ### 3. Représenter graphiquement la distribution de la durée des films
@@ -78,7 +80,7 @@ round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
 library(tidyverse)
 complete_data$duration <- as.numeric(complete_data$duration)
 ggplot(complete_data, aes(x = duration)) +
-  geom_histogram(color = "red", fill = 'green', binwidth = 50, alpha = 1)  + 
+  geom_histogram(color = "blue", fill = 'steelblue', binwidth = 50, alpha = 1)  + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
   scale_y_continuous(n.breaks = 15) +
@@ -326,7 +328,7 @@ top_10_film %>%
 ```{r}
 typeof(complete_data$votes)
 ```
-
+`
 
 
 
