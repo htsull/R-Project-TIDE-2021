@@ -5,16 +5,14 @@
 
 # Define dashboardHeader()
 header <- dashboardHeader(title = "Movies Database",
-                          
                           tags$li(class="dropdown",
-                                  tags$a(href="https://github.com/aagarw30/R-Shinyapp-Tutorial", icon("github"), 
+                                  tags$a(href="https://github.com/aagarw30/R-Shinyapp-Tutorial", 
+                                         icon("github"), 
                                          "Source Code", 
                                          target="_blank")
                                 )
-                          
                           )
                          
-                          
 # Define dashboardSidebar()
 sidebar <- dashboardSidebar(
   sidebarMenu(
@@ -40,85 +38,36 @@ body <- dashboardBody(
     ),
     
     tabItems(
-      
-        tabItem("movies_infos",
-                
-    # Row srtucture
-    fluidRow(
-      
+      tabItem("movies_infos",
+      # Row srtucture
+      fluidRow(
         column(3,
-               
                # Define User inputs
                selectInput("decade", 
                               label = "Choose decade", 
                               choices = decade_val,
-                              selected = NULL
-                              ),
+                              selected = NULL),
                
                selectInput("title",
                            label = "Choose title below",
-                           choices = ""
-                           ),
-               
+                           choices = ""),
                textOutput("founds"),
-               
                ),
-        
         
         column(9,
                uiOutput("filtered_table")
                )
-               
         )
-
-),
+    ),
 
 tabItem("data_table",
     fluidPage(
-        fluidRow(
-            column(3,
-                   selectInput("tab_fil1",
-                               label = "Filter Select",
-                               choices = c("Language", "Actor", "Genre")
-                                )
-                   ),
-            
-            column(3,
-                   selectInput("tab_fil2",
-                               label = "",
-                               choices = "")
-                   ),
-            column(3,
-                   sliderInput("tab_fil3",
-                               label = "Number of observations",
-                               min = 0,
-                               max = 100,
-                               step = 10,
-                               value = 30
-                               )
-                   )
-            
-            
-            ),
-        
-        dataTableOutput("data_view")
+        fluidRow(dataTableOutput("data_view")
+              )
     )
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         ),
 
-tabItem("hall_of_fame",
-        
-        )
+tabItem("hall_of_fame")
       )
 )
 
