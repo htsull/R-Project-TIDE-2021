@@ -9,7 +9,13 @@ header <- dashboardHeader(title = "Movies Database",
                                   tags$a(href="https://github.com/aagarw30/R-Shinyapp-Tutorial", 
                                          icon("github"), 
                                          "Source Code", 
+                                         target="_blank"),
+                                  tags$li(class="dropdown",
+                                  tags$a(href="https://github.com/aagarw30/R-Shinyapp-Tutorial", 
+                                         icon("github"), 
+                                         "Source Code", 
                                          target="_blank")
+                                  )
                                 )
                           )
                          
@@ -24,8 +30,6 @@ sidebar <- dashboardSidebar(
              badgeLabel =icon("sort-amount-up"), badgeColor = "light-blue")
               )
 )
-
-
 
 # Define dashboardBody()
 body <- dashboardBody(
