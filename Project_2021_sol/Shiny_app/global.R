@@ -2,7 +2,7 @@ source("req_packages.R")
 source("home_table.R")
 
 path_ <- "./data_shiny_useable.csv"
-data_ <- read.csv(file = path_, sep = ",", header = T, encoding = "uft-8")
+data_ <- read.csv(file = path_, sep = ",", header = T, encoding = "UTF-8")
 
 
 decade_val <- unique(data_$decade) %>%  sort %>% as.list

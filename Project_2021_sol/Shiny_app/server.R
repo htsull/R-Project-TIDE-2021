@@ -11,7 +11,7 @@ server <- function(input, output, session) {
   
   titleChoices <- reactive({
   
-    data_$title[data_$decade == input$decade] %>% sort
+    data_$original_title[data_$decade == input$decade] %>% sort
     
   })
   
@@ -23,36 +23,36 @@ server <- function(input, output, session) {
     
     table(original_title = input$title,
           
-          year = data_$year[data_$decade == input$decade & data_$title == input$title],
+          year = data_$year[data_$decade == input$decade & data_$original_title == input$title],
           
-          director = data_$director[data_$decade == input$decade & data_$title == input$title],
+          director = data_$director[data_$decade == input$decade & data_$original_title == input$title],
           
-          genre = data_$genre[data_$decade == input$decade & data_$title == input$title],
+          genre = data_$genre[data_$decade == input$decade & data_$original_title == input$title],
           
-          writer = data_$writer[data_$decade == input$decade & data_$title == input$title],
+          writer = data_$writer[data_$decade == input$decade & data_$original_title == input$title],
           
-          duration = data_$duration[data_$decade == input$decade & data_$title == input$title],
+          duration = data_$duration[data_$decade == input$decade & data_$original_title == input$title],
           
-          production_company = data_$production_company[data_$decade == input$decade & data_$title == input$title],
+          production_company = data_$production_company[data_$decade == input$decade & data_$original_title == input$title],
           
-          country = data_$country[data_$decade == input$decade & data_$title == input$title],
+          country = data_$country[data_$decade == input$decade & data_$original_title == input$title],
           
-          actors = data_$actors[data_$decade == input$decade & data_$title == input$title],
+          actors = data_$actors[data_$decade == input$decade & data_$original_title == input$title],
           
-          language = data_$language[data_$decade == input$decade & data_$title == input$title],
+          language = data_$language[data_$decade == input$decade & data_$original_title == input$title],
           
-          avg_vote = data_$avg_vote[data_$decade == input$decade & data_$title == input$title],
+          avg_vote = data_$avg_vote[data_$decade == input$decade & data_$original_title == input$title],
           
-          budget = data_$budget[data_$decade == input$decade & data_$title == input$title],
+          budget = data_$budget[data_$decade == input$decade & data_$original_title == input$title],
           
-          description = data_$description[data_$decade == input$decade & data_$title == input$title]
+          description = data_$description[data_$decade == input$decade & data_$original_title == input$title]
           )
   })
 
 # output of the findings length afer user input filter
   output$founds <- reactive({
     
-    paste(data_$title[data_$decade == input$decade] %>% length(), "result(s) found")
+    paste(data_$original_title[data_$decade == input$decade] %>% length(), "result(s) found")
     
   })
   
