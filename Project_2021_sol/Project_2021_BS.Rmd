@@ -64,7 +64,7 @@ sapply(complete_data,function(x) sum(is.na(x)))
 complete_data[complete_data == ""]<- NA # Remplacer les vides par des NAs.
 sapply(complete_data,function(x) sum(is.na(x)))
 ```
-#### Après avoir remplacé les cases vides par des Nas, nous voyons que le nbre de Nas augmente pour certaines variables et que d'autres qui n'en ont pas, ont maintenant de Nas.*
+#### Après avoir remplacé les cases vides par des Nas, nous voyons que le nbre de Nas augmente pour certaines variables et que d'autres qui n'en ont pas, ont maintenant de Nas.
 #### Affichons maintenant le pourcentage de Nas pour chaque variable
 
 
@@ -80,12 +80,12 @@ print.table(na_percent)
 ```{r, message=FALSE}
 library(tidyverse)
 complete_data$duration <- as.numeric(complete_data$duration)
-ggplot(complete_data, aes(x = duration)) +
-  geom_histogram(color = "blue", fill = 'steelblue', binwidth = 50, alpha = 1)  + 
+ggplot(complete_data, aes(x = duration, fill = duration)) +
+  geom_histogram(color = "green", binwidth = 50, alpha = 1)  + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
   scale_y_continuous(n.breaks = 15) +
-  scale_x_continuous(n.breaks = 20)
+  scale_x_continuous(n.breaks = 15)
 ```
 ### 4. Compter le nombre de films dans lesquels la langue française apparait.
 
@@ -197,8 +197,9 @@ report <- function(x, name) {
 Ind_Stat <- data %>% imap_dfr(report)
 
 
-datatable(Ind_Stat, )
+datatable(Ind_Stat,)
 ```
+
 
 
 #### Représentez graphiquement ces résultats
@@ -250,6 +251,30 @@ ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
 ### Pour décrire le lien entre une variable catégorielle et une variable quantitative, on peut calculer certaines caractéristiques de la variable quantitative (par exemple sa moyenne) par groupe (défini par les modalités de la variable catégorielle). Pour cela, la fonction summarise() du package dplyr est tout indiquée:
 
 ```{r}
+
+# complete_data %>% select(genre) %>% unique()
+# uniGenre <- function(vect_){
+#     genre1 <- vect_
+#     genre2 <- paste0(genre1, collapse = ',')
+#     genre3 <- strsplit(genre2, ",")
+#     genre4 <- genre3[[1]] %>% unique %>% sort
+#     return(genre4)
+# }
+# fon <- uniGenre(complete_data$genre)
+```
+
+
+```{r}
+# ggplot(complete_data, aes(x = avg_vote_10, color = genre)) +
+#   stat_ecdf() +
+#   scale_x_continuous(breaks = seq(0, 26, 2)) +
+#   scale_y_continuous(breaks = seq(0, 1, 0.1),
+#                      labels = scales::percent) +
+#   # labs(x = "Note examen", y = "% d'Ã©tudiants")
+```
+
+
+```{r}
 complete_data %>% 
   group_by(genre) %>% 
   summarise(moy_votes=mean(votes),
@@ -262,20 +287,42 @@ complete_data %>%
 
 ```{r}
 f <- complete_data %>% 
-  filter(str_detect(genre, "Romance"))
+  filter(str_detect(genre, "Adventure"))
 tail(sort(f$avg_vote), 10)
+
 ```
 
 ```{r}
 f <- complete_data %>% 
-  filter(str_detect(genre, "Romance"))
+  filter(str_detect(genre, "Action")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
 ```
+
 ```{r}
-f %>%
-  select(avg_vote, title)%>%
-  tail(10)
+
+ggplot(data = f, aes(x = title, y = avg_vote, color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("top 10 des films") +
+  ylab("Note") +
+  ggtitle("représentation graphique du top\n 10 des films les mieux notés")
 
 ```
+
+
+```{r}
+# f <- complete_data %>% 
+#   filter(str_detect(genre, "Adventure"))
+# top_10_film <- f %>% 
+#   select(avg_vote, title) %>%
+#   arrange(desc(avg_vote)) %>% 
+#   head(10)
+# datatable(top_10_film)
+```
+
+
 
 
 
