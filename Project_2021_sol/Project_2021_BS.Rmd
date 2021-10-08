@@ -12,10 +12,11 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
 ### 1.Proposer un code permettant de regrouper les données contenues dans movies.zip dans un seul et même data.frame.
-```{r, message = FALSE} 
+```{r, message = FALSE, warning=FALSE} 
 #Attach the necessary libraries
 library(dplyr)
 library(readr)
+library(DT)
 
 #1. Capture the raw pat of the zip folder
 raw_path <- "./movies.zip"
@@ -74,7 +75,7 @@ round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
 
 ### 3. Représenter graphiquement la distribution de la durée des films
 
-```{r}
+```{r, message=FALSE}
 library(tidyverse)
 complete_data$duration <- as.numeric(complete_data$duration)
 ggplot(complete_data, aes(x = duration)) +
@@ -144,7 +145,7 @@ complete_data$decade <- cut(complete_data$year,
 #randomly select some line in year and decade columns to verify the results
 complete_data %>% 
   select(year, decade)%>% 
-  sample_n(50)
+  sample_n(50) %>% datatable()
 ```
 
 
@@ -192,8 +193,24 @@ report <- function(x, name) {
 }
 
 Ind_Stat <- data %>% imap_dfr(report)
-Ind_Stat
+
+
+datatable(Ind_Stat, )
 ```
+
+```{r}
+dt_stat <-Ind_Stat %>% 
+  select("mean", "median", "sd", "mad", "coef_de_var", "max", "min")
+boxplot(dt_stat)
+ggplot(Ind_Stat, aes(x=variable, y= , fill=variable)) +
+  geom_boxplot()+
+  geom_text(aes(label=median), vjust=-0.3, size=3.5)+
+  theme_minimal()
+
+
+```
+
+
 #### Vu que les variables avg_vote et avg_vote_10 sont identiques, on a décidé de garder que la variable avg_vote_10.
 
 #### Représentez graphiquement ces résultats
@@ -244,7 +261,7 @@ ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
  
 #### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
 
-#### Tout d’abord il est intéressant de les représenter graphiquements au moyen de boîtes à moustaches côte à côte, pour mieux comparer les dispersions des chaques modalités de la variable qualitative(genre).
+#### Tout d’abord il est intéressant de les représenter graphiquement au moyen de boîtes à moustaches côte à côte, pour mieux comparer les dispersions des chaques modalités de la variable qualitative(genre).
 
 
 ```{r}
@@ -256,8 +273,8 @@ ggplot(complete_data, mapping = aes(x=genre, y=votes))+
 ```{r}
 ggplot(complete_data) +
   aes(x=genre, y=votes,  colour="green") +
-  geom_boxplot() + 
-    guides(scale="none") + coord_flip()
+  geom_boxplot() +
+  # guides(scale="none") + coord_flip() +
   xlab("Votes") +
   ylab("Genre") +
   ggtitle("Répartition de notation en fonction du genre de film")
