@@ -251,7 +251,7 @@ ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
 ### Pour décrire le lien entre une variable catégorielle et une variable quantitative, on peut calculer certaines caractéristiques de la variable quantitative (par exemple sa moyenne) par groupe (défini par les modalités de la variable catégorielle). Pour cela, la fonction summarise() du package dplyr est tout indiquée:
 
 ```{r}
-
+# 
 # complete_data %>% select(genre) %>% unique()
 # uniGenre <- function(vect_){
 #     genre1 <- vect_
@@ -283,6 +283,17 @@ complete_data %>%
             sd_votes=sd(votes))
 ```
 
+
+
+```{r}
+ggplot(data = complete_data, aes(x = genre, y = avg_vote, color = genre)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = genre)) + 
+  xlab("top 10 des films") +
+  ylab("Note") +
+  ggtitle("représentation graphique du top\n 10 des films les mieux notés")
+```
+
 #### 9) Pour chaque genre de film, représenter graphiquement le top 10 des films les mieux notés
 
 ```{r}
@@ -311,11 +322,6 @@ ggplot(data = f, aes(x = title, y = avg_vote, color = title)) +
 
 ```
 
-
-```{r}
-ggplot(f, aes(factor(title), avg_vote)) + 
-    geom_jitter()
-```
 
 
 
