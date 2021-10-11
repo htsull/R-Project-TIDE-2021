@@ -12,10 +12,11 @@ knitr::opts_chunk$set(warning = FALSE, message = FALSE)
 ```
 
 ### 1.Proposer un code permettant de regrouper les données contenues dans movies.zip dans un seul et même data.frame.
-```{r, message = FALSE} 
+```{r, message = FALSE, warning=FALSE} 
 #Attach the necessary libraries
 library(dplyr)
 library(readr)
+library(DT)
 
 #1. Capture the raw pat of the zip folder
 raw_path <- "./movies.zip"
@@ -53,38 +54,38 @@ complete_data <- read.csv(file = "./complete_data.csv", header = T)
 
 ### 2. Observer pour chaque variable, le nombre et la proportion de valeurs manquantes.
 
+#### nombre de valeurs manquantes
 ```{r}
-#  Presentage of missng values
-na_percent <- round(na_num/sum(is.na(complete_data) * 100), 3)
-
-print.table(na_percent)
+sapply(complete_data,function(x) sum(is.na(x)))
 ```
-#### Nous constatons que la variable Country ne contient pas de NA. Cependant, ladite variavle et d'autres ont des cases vides. Ainsi, nous avons  décidé de les gérer comme des NAs.
+#### Nous constatons que certaines variable de la data ont des cases vides. Ainsi, nous avons  décidé de les gérer comme des NAs.*
 
 ```{r}
 complete_data[complete_data == ""]<- NA # Remplacer les vides par des NAs.
+sapply(complete_data,function(x) sum(is.na(x)))
 ```
+#### Après avoir remplacé les cases vides par des Nas, nous voyons que le nbre de Nas augmente pour certaines variables et que d'autres qui n'en ont pas, ont maintenant de Nas.
+#### Affichons maintenant le pourcentage de Nas pour chaque variable
 
-### 2.1. Observons à nouveau pour chaque variable, le nombre et la proportion de valeurs manquantes.
 
 ```{r}
 #  Presentage of missng values
-round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
+na_percent <- round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
 
 print.table(na_percent)
 ```
 
 ### 3. Représenter graphiquement la distribution de la durée des films
 
-```{r}
+```{r, message=FALSE}
 library(tidyverse)
 complete_data$duration <- as.numeric(complete_data$duration)
-ggplot(complete_data, aes(x = duration)) +
-  geom_histogram(color = "blue", fill = 'steelblue', binwidth = 50, alpha = 1)  + 
+ggplot(complete_data, aes(x = duration, fill = duration)) +
+  geom_histogram(color = "green", binwidth = 50, alpha = 1)  + 
   theme(plot.title = element_text(hjust = 0.5)) + 
   labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
   scale_y_continuous(n.breaks = 15) +
-  scale_x_continuous(n.breaks = 20)
+  scale_x_continuous(n.breaks = 15)
 ```
 ### 4. Compter le nombre de films dans lesquels la langue française apparait.
 
@@ -96,7 +97,6 @@ complete_data %>%
   count() %>% 
   paste(.,'films sont disponibles en francais')
 ```
-
 
 ### 5. Créer une variable permettant de discrétiser la variable year par décennie (ex : 1975 => Entre 1970 et 1980, 1995 => Entre 1990 et 2000, 2001 => Entre 2000 et 2010…)
 
@@ -146,7 +146,7 @@ complete_data$decade <- cut(complete_data$year,
 #randomly select some line in year and decade columns to verify the results
 complete_data %>% 
   select(year, decade)%>% 
-  sample_n(50)
+  sample_n(50) %>% datatable()
 ```
 
 
@@ -164,13 +164,14 @@ ggplot(dt, aes(x=decade,y=n, fill=decade)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=p), vjust=-0.3, size=3.5)+
   theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1)) + 
-  labs(title = "Représentation de la quantité de films dans lesquels la langue française apparait par décenie",
+  labs(title = "Représentation de la quantité de films dans lesquels\n la langue française apparait par décenie",
        x = "Décennie", y = "Effectif")
 
 ```
 
-
 ### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
+
+#### Vu que les variables avg_vote et avg_vote_10 sont identiques, on a décidé de garder que la variable avg_vote_10.
 
 ```{r}
 data <-complete_data %>% 
@@ -194,9 +195,12 @@ report <- function(x, name) {
 }
 
 Ind_Stat <- data %>% imap_dfr(report)
-Ind_Stat
+
+
+datatable(Ind_Stat,)
 ```
-#### Vu que les variables avg_vote et avg_vote_10 sont identiques, on a décidé de garder que la variable avg_vote_10.
+
+
 
 #### Représentez graphiquement ces résultats
 
@@ -241,33 +245,34 @@ ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
 #                                                       "Sd", "Mad", "cv", "max", "min"), label_size = 14, hjust = -0.5, vjust =1.5, greedy = TRUE, byrow = T)
 ```
 
-
- 
  
 #### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
 
-#### Tout d’abord il est intéressant de les représenter graphiquements au moyen de boîtes à moustaches côte à côte, pour mieux comparer les dispersions des chaques modalités de la variable qualitative(genre).
-
-
-```{r}
-ggplot(complete_data, mapping = aes(x=genre, y=votes))+
-  geom_boxplot()
-```
-
-
-```{r}
-ggplot(complete_data) +
-  aes(x=genre, y=votes,  colour="green") +
-  geom_boxplot() + 
-    guides(scale="none") + coord_flip()
-  xlab("Votes") +
-  ylab("Genre") +
-  ggtitle("Répartition de notation en fonction du genre de film")
-# facet_wrap(~genre)
-```
-
-
 ### Pour décrire le lien entre une variable catégorielle et une variable quantitative, on peut calculer certaines caractéristiques de la variable quantitative (par exemple sa moyenne) par groupe (défini par les modalités de la variable catégorielle). Pour cela, la fonction summarise() du package dplyr est tout indiquée:
+
+```{r}
+
+# complete_data %>% select(genre) %>% unique()
+# uniGenre <- function(vect_){
+#     genre1 <- vect_
+#     genre2 <- paste0(genre1, collapse = ',')
+#     genre3 <- strsplit(genre2, ",")
+#     genre4 <- genre3[[1]] %>% unique %>% sort
+#     return(genre4)
+# }
+# fon <- uniGenre(complete_data$genre)
+```
+
+
+```{r}
+# ggplot(complete_data, aes(x = avg_vote_10, color = genre)) +
+#   stat_ecdf() +
+#   scale_x_continuous(breaks = seq(0, 26, 2)) +
+#   scale_y_continuous(breaks = seq(0, 1, 0.1),
+#                      labels = scales::percent) +
+#   # labs(x = "Note examen", y = "% d'Ã©tudiants")
+```
+
 
 ```{r}
 complete_data %>% 
@@ -281,54 +286,40 @@ complete_data %>%
 #### 9) Pour chaque genre de film, représenter graphiquement le top 10 des films les mieux notés
 
 ```{r}
-View(table(complete_data$genre))
+# f <- complete_data %>% 
+#   filter(str_detect(genre, "Adventure"))
+# tail(sort(f$avg_vote), 10)
+
 ```
 
 ```{r}
-top_10_film <- complete_data %>% 
-  select(votes, genre) %>%
-  arrange(desc(votes)) %>% 
+f <- complete_data %>% 
+  filter(str_detect(genre, "Action")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
   head(10)
-
-complete_data %>% select(genre) %>% unique()
-
-uniGenre <- function(vect_){
-    genre1 <- vect_
-    genre2 <- paste0(genre1, collapse = ',')
-    genre3 <- strsplit(genre2, ",")
-    genre4 <- genre3[[1]] %>% unique %>% sort
-    return(genre4)
-}
-
-fon <- uniGenre(complete_data$genre)
-
-complete_data$original_title[grepl('Action', complete_data$genre)] %>% length()
-
-for i in fon{
-  complete_data$genre[grepl(i, complete_data$genre)] %>% length()
-}
-
-
-
-
-
-complete_data$
-top_10_film %>%
-  select(votes, genre)
-  
-  ggplot(top_10_film, aes(x=genre,y=votes, fill=genre)) +
-  geom_bar(stat="identity", color="black")+
-  theme_minimal() + 
-  labs(title = "représenter graphiquement le top 10 des films les mieux notés",
-       x = "Genre", y = "Nbre_de_votes")
 ```
 
+```{r}
+
+ggplot(data = f, aes(x = title, y = avg_vote, color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("top 10 des films") +
+  ylab("Note") +
+  ggtitle("représentation graphique du top\n 10 des films les mieux notés")
+
+```
 
 
 ```{r}
-typeof(complete_data$votes)
+ggplot(f, aes(factor(title), avg_vote)) + 
+    geom_jitter()
 ```
-`
+
+
+
+
 
 
 
