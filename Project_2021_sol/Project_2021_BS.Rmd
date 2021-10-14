@@ -163,7 +163,7 @@ dt <- complete_data %>%
 ggplot(dt, aes(x=decade,y=n, fill=decade)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=p), vjust=-0.3, size=3.5)+
-  theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1)) + 
+  theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1, colour =rainbow(11))) + 
   labs(title = "Représentation de la quantité de films dans lesquels\n la langue française apparait par décenie",
        x = "Décennie", y = "Effectif")
 
@@ -248,130 +248,363 @@ ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
  
 #### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
 
-### Pour décrire le lien entre une variable catégorielle et une variable quantitative, on peut calculer certaines caractéristiques de la variable quantitative (par exemple sa moyenne) par groupe (défini par les modalités de la variable catégorielle). Pour cela, la fonction summarise() du package dplyr est tout indiquée:
-
-
 ```{r}
-genre <- unique(complete_data$genre)
-genre_split <- c()
-for(i in 1:length(genre)){
-  genre_split <- c(genre_split, unlist(str_split(genre[i],",")))
+uni_ <- function(data){
+  data %>%
+    paste(., collapse = ",") %>%
+    str_replace_all(., fixed(" "), "") %>%
+    strsplit(., ",") %>%
+    unlist() %>%
+    unique() %>%
+    sort
 }
-genre <- unique(genre_split);genre
-```
-
-```{r}
-ff<- str_split(complete_data$genre,", ")
-y<- intersect(ff,complete_data$genre);y
+gen <- uni_(complete_data$genre);gen   # Visualiser le nombre de genres différents de la data
 ```
 
 
-
 ```{r}
-avg_vote_par_genre <- function(x){
-  d <- complete_data %>%
+
+avg_vote_genre <- function(x){
+  dt <- complete_data %>%
     filter(grepl(x, genre))
-  return(mean(d$avg_vote))
+  return (mean(dt$avg_vote))
 }
-notation_film_par_genre <- genre %>%
-  sapply(avg_vote_par_genre)
-notation_film_par_genre <- as.data.frame(notation_film_par_genre)
-names(notation_film_par_genre)<- "avg_vote"
-df_avg_vote_par_genre <- data.frame(genre, avg_vote=as.vector(notation_film_par_genre))
-couleur <- c(rep(c(1,7),12),1)
-couleur2 <- c(1,1,1,7,1,7,1,1,7,7,7,1,1,1,7,1,7,1,1,7,7,1,7,7,7)
-ggplot(df_avg_vote_par_genre, aes(x=as.factor(genre), y=avg_vote))+
-  geom_point(size=1.5, col=couleur2)+
-  geom_segment(aes(x=genre, xend = genre, y=0, yend=avg_vote), col=couleur2)+
-  geom_text(aes(label=round(avg_vote, 2), y=avg_vote, vjust=-0.4),col=couleur2)+
-  labs(x="genre de film", y="note moyenne sur 10")+
-  theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 1, vjust=.4, size = 10, colour = couleur), axis.title = element_text(size = 14))
-  
+note_film_genre <- genre %>%
+  sapply(avg_vote_genre)
+note_film_genre <- as.data.frame(note_film_genre)
+names(note_film_genre)<- "avg_vote"
+df_avg_vote_genre <- data.frame(genre, avg_vote=as.vector(note_film_genre))
+ggplot(df_avg_vote_genre, aes(y = avg_vote, x =fct_rev(fct_reorder(genre, avg_vote,.fun="median")),color = genre)) + 
+  geom_point(size=1.5)+
+  geom_segment(aes(x=genre, xend = genre, y=0, yend=avg_vote), fill=genre)+
+  geom_text(aes(label=round(avg_vote, 1), y=avg_vote, vjust=-0.4))+
+  labs(title = "Notation en fonction du genre de film", x="genres de film", y="Notes")+
+  theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 1, vjust=.4, size = 10, colour =rainbow(25)), axis.title = element_text(size = 14))+
+  theme( axis.line = element_line(colour = "darkblue", 
+                      size = 1, linetype = "solid"))
 ```
 
-
-
-```{r}
-# 
-# complete_data %>% select(genre) %>% unique()
-# uniGenre <- function(vect_){
-#     genre1 <- vect_
-#     genre2 <- paste0(genre1, collapse = ',')
-#     genre3 <- strsplit(genre2, ",")
-#     genre4 <- genre3[[1]] %>% unique %>% sort
-#     return(genre4)
-# }
-# fon <- uniGenre(complete_data$genre)
-```
-
-
-```{r}
-# ggplot(complete_data, aes(x = avg_vote_10, color = genre)) +
-#   stat_ecdf() +
-#   scale_x_continuous(breaks = seq(0, 26, 2)) +
-#   scale_y_continuous(breaks = seq(0, 1, 0.1),
-#                      labels = scales::percent) +
-#   # labs(x = "Note examen", y = "% d'Ã©tudiants")
-```
-
-
-```{r}
-complete_data %>% 
-  group_by(genre) %>% 
-  summarise(moy_votes=mean(votes),
-            max_votes=max(votes),
-            min_votes=min(votes),
-            sd_votes=sd(votes))
-```
-
-
-
-```{r}
-ggplot(data = complete_data, aes(x = genre, y = avg_vote, color = genre)) +   
-  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
-  geom_boxplot(aes(fill = genre)) + 
-  xlab("top 10 des films") +
-  ylab("Note") +
-  ggtitle("représentation graphique du top\n 10 des films les mieux notés")
-```
 
 #### 9) Pour chaque genre de film, représenter graphiquement le top 10 des films les mieux notés
 
 ```{r}
-# f <- complete_data %>% 
-#   filter(str_detect(genre, "Adventure"))
-# tail(sort(f$avg_vote), 10)
+Ac <- complete_data %>% 
+  filter(str_detect(genre, "Action")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Ac, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Action les mieux notés ")
 
-```
 
-```{r}
-f <- complete_data %>% 
+ Ad <- complete_data %>% 
+  filter(str_detect(genre, "Adult")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Ad, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Adult les mieux notés ")
+
+Adv <- complete_data %>% 
+  filter(str_detect(genre, "Adventure")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Adv, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Adventure les mieux notés ")
+
+Ani <- complete_data %>% 
+  filter(str_detect(genre, "Animation")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Ani, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Animation les mieux notés ")
+
+Bio <- complete_data %>% 
+  filter(str_detect(genre, "Biography")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Bio, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Biography les mieux notés ")
+
+Co <- complete_data %>% 
+  filter(str_detect(genre, "Comedy")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Co, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Comedy les mieux notés ")
+
+Cr <- complete_data %>% 
+  filter(str_detect(genre, "Crime")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Cr, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Crime les mieux notés ")
+
+Doc <- complete_data %>% 
+  filter(str_detect(genre, "Documentary")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Doc, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Documentary les mieux notés ")
+
+Dra <- complete_data %>% 
   filter(str_detect(genre, "Drama")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
   head(10)
-```
-
-```{r}
-
-ggplot(data = f, aes(x = title, y = avg_vote, color = title)) +   
+ggplot(Dra, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
   theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
   geom_boxplot(aes(fill = title)) + 
-  xlab("top 10 des films") +
-  ylab("Note") +
-  ggtitle("représentation graphique du top\n 10 des films les mieux notés")
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Drama les mieux notés ")
+
+Fam <- complete_data %>% 
+  filter(str_detect(genre, "Family")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Fam, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Family les mieux notés ")
+  
+
+Fan <- complete_data %>% 
+  filter(str_detect(genre, "Fantasy")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Fan, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Fantasy les mieux notés ")
+
+
+
+Film <- complete_data %>% 
+  filter(str_detect(genre, "Film-Noir")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Film, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Film-Noir les mieux notés ")
+
+
+His <- complete_data %>% 
+  filter(str_detect(genre, "History")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(His, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n History les mieux notés ")
+
+
+Ho <- complete_data %>% 
+  filter(str_detect(genre, "Horror")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Ho, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Horror les mieux notés ")
+
+
+Mus <- complete_data %>% 
+  filter(str_detect(genre, "Music")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Mus, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Music les mieux notés ")
+
+
+Mu <- complete_data %>% 
+  filter(str_detect(genre, "Musical")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Mu, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Musical les mieux notés ")
+
+
+Mys <- complete_data %>% 
+  filter(str_detect(genre, "Mystery")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Mys, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Mystery les mieux notés ")
+
+
+News <- complete_data %>% 
+  filter(str_detect(genre, "News")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(News, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n News les mieux notés ")
+
+
+Real <- complete_data %>% 
+  filter(str_detect(genre, "Reality-TV")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Real, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Reality-TV les mieux notés ")
+
+
+Ro <- complete_data %>% 
+  filter(str_detect(genre, "Romance")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Ro, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Romance les mieux notés ")
+
+
+Sci <- complete_data %>% 
+  filter(str_detect(genre, "Sci-Fi")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Sci, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Sci-Fi les mieux notés ")
+
+
+Sp <- complete_data %>% 
+  filter(str_detect(genre, "Sport")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Sp, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Sport les mieux notés ")
+
+
+Thr <- complete_data %>% 
+  filter(str_detect(genre, "Thriller")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Thr, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Thriller les mieux notés ")
+
+
+Wa <- complete_data %>% 
+  filter(str_detect(genre, "War")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Wa, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n War les mieux notés ")
+
+
+
+Wes <- complete_data %>% 
+  filter(str_detect(genre, "Western")) %>%
+  select(avg_vote, title) %>%
+  arrange(desc(avg_vote)) %>% 
+  head(10)
+ggplot(Wes, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median")),color = title)) +   
+  theme(axis.text.x = element_text(vjust=.8, hjust=1, angle=60)) + 
+  geom_boxplot(aes(fill = title)) + 
+  xlab("Films") +
+  ylab("Notes") +
+  ggtitle("Top 10 des films du genre\n Western les mieux notés ")
+
 
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
