@@ -305,7 +305,7 @@ ggplot(data = complete_data, aes(x = genre, y = avg_vote, color = genre)) +
 
 ```{r}
 f <- complete_data %>% 
-  filter(str_detect(genre, "Action")) %>%
+  filter(str_detect(genre, "Drama")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
   head(10)
