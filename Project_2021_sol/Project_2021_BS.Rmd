@@ -5,6 +5,7 @@ date: "9/16/2021"
 output:
   html_document:
     df_print: paged
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -245,10 +246,6 @@ ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
   geom_bar(stat="identity", color="black")+
   geom_text(aes(label=min), vjust=-0.3, size=3.5)+
   theme_minimal()
-
-# library(cowplot)
-# plot_grid(moy, med, sd, mad, cv, max, min, labels = c("Moy", "Med",
-#                                                       "Sd", "Mad", "cv", "max", "min"), label_size = 14, hjust = -0.5, vjust =1.5, greedy = TRUE, byrow = T)
 ```
 
  
