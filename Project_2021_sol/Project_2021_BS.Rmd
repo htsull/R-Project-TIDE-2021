@@ -81,11 +81,13 @@ print.table(na_percent)
 library(tidyverse)
 complete_data$duration <- as.numeric(complete_data$duration)
 ggplot(complete_data, aes(x = duration, fill = duration)) +
-  geom_histogram(color = "green", binwidth = 50, alpha = 1)  + 
+  geom_histogram(color = "green", binwidth = 50, alpha = 1) +
   theme(plot.title = element_text(hjust = 0.5)) + 
   labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
   scale_y_continuous(n.breaks = 15) +
-  scale_x_continuous(n.breaks = 15)
+  scale_x_continuous(n.breaks = 15)+
+  theme( axis.line = element_line(colour = "red", 
+                      size = 1, linetype = "solid"))
 ```
 ### 4. Compter le nombre de films dans lesquels la langue française apparait.
 
@@ -99,6 +101,8 @@ complete_data %>%
 ```
 
 ### 5. Créer une variable permettant de discrétiser la variable year par décennie (ex : 1975 => Entre 1970 et 1980, 1995 => Entre 1990 et 2000, 2001 => Entre 2000 et 2010…)
+
+##### Voyons le type de la variable year
 
 ```{r}
 paste("La variable Year est de type :", typeof(complete_data$year))
@@ -154,20 +158,22 @@ complete_data %>%
 
 ```{r}
 dt <- complete_data %>%
-  select(language, decade) %>% 
-  group_by(decade) %>% 
-  count(french = str_detect(language, "French|.French.")) %>% 
-  mutate(p = scales::percent(n / sum(n))) %>% 
-  filter(french == T)
-  
-ggplot(dt, aes(x=decade,y=n, fill=decade)) +
-  geom_bar(stat="identity", color="black")+
-  geom_text(aes(label=p), vjust=-0.3, size=3.5)+
-  theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1, colour =rainbow(11))) + 
-  labs(title = "Représentation de la quantité de films dans lesquels\n la langue française apparait par décenie",
-       x = "Décennie", y = "Effectif")
+select(language, decade) %>%
+group_by(decade) %>%
+count(french = str_detect(language, "French|.French.")) %>%
+mutate(p = scales::percent(n / sum(n))) %>%
+filter(french == TRUE)
 
+ggplot(dt, aes(x=decade,y=n, fill=decade)) +
+geom_bar(stat="identity", color="black")+
+geom_text(aes(label=p), vjust=-0.3, size=3.5)+
+theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1, colour = rainbow(11))) +
+labs(title = "Représentation de la quantité de films\n dans lesquels la langue française apparait\n par décenie",
+x = "Décennie", y = "Effectif")+
+  theme( axis.line = element_line(colour = "darkblue", 
+                      size = 1, linetype = "solid"))
 ```
+
 
 ### 7. Pour toutes les variables de la forme « avg_vote ». Calculer la moyenne, la médiane, l’écart type, la mad (median absolute deviation), le coefficient de variation, la valeur maximum et la valeur minimum. Représentez graphiquement ces résultats.
 
@@ -258,7 +264,7 @@ uni_ <- function(data){
     unique() %>%
     sort
 }
-gen <- uni_(complete_data$genre);gen   # Visualiser le nombre de genres différents de la data
+genre <- uni_(complete_data$genre);genre   # Visualiser le nombre de genres différents de la data
 ```
 
 
@@ -277,7 +283,7 @@ df_avg_vote_genre <- data.frame(genre, avg_vote=as.vector(note_film_genre))
 ggplot(df_avg_vote_genre, aes(y = avg_vote, x =fct_rev(fct_reorder(genre, avg_vote,.fun="median")),color = genre)) + 
   geom_point(size=1.5)+
   geom_segment(aes(x=genre, xend = genre, y=0, yend=avg_vote), fill=genre)+
-  geom_text(aes(label=round(avg_vote, 1), y=avg_vote, vjust=-0.4))+
+  geom_text(aes(label=round(avg_vote, 1), y=avg_vote, vjust=-0.6))+
   labs(title = "Notation en fonction du genre de film", x="genres de film", y="Notes")+
   theme(legend.position = "none", axis.text.x = element_text(angle = 90, hjust = 1, vjust=.4, size = 10, colour =rainbow(25)), axis.title = element_text(size = 14))+
   theme( axis.line = element_line(colour = "darkblue", 
@@ -311,7 +317,7 @@ ggplot(Ad, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   geom_boxplot(aes(fill = title)) + 
   xlab("Films") +
   ylab("Notes") +
-  ggtitle("Top 10 des films du genre\n Adult les mieux notés ")
+  ggtitle("Les 2 films du genre Adult")
 
 Adv <- complete_data %>% 
   filter(str_detect(genre, "Adventure")) %>%
@@ -383,7 +389,7 @@ ggplot(Doc, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   geom_boxplot(aes(fill = title)) + 
   xlab("Films") +
   ylab("Notes") +
-  ggtitle("Top 10 des films du genre\n Documentary les mieux notés ")
+  ggtitle("Les 2 films du genre Documentary")
 
 Dra <- complete_data %>% 
   filter(str_detect(genre, "Drama")) %>%
@@ -512,7 +518,7 @@ ggplot(News, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="medi
   geom_boxplot(aes(fill = title)) + 
   xlab("Films") +
   ylab("Notes") +
-  ggtitle("Top 10 des films du genre\n News les mieux notés ")
+  ggtitle("L'unique film du genre News")
 
 
 Real <- complete_data %>% 
@@ -525,7 +531,7 @@ ggplot(Real, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="medi
   geom_boxplot(aes(fill = title)) + 
   xlab("Films") +
   ylab("Notes") +
-  ggtitle("Top 10 des films du genre\n Reality-TV les mieux notés ")
+  ggtitle("Les 3 films du genre Reality-TV\n en fonction de leur note")
 
 
 Ro <- complete_data %>% 
@@ -606,5 +612,21 @@ ggplot(Wes, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ylab("Notes") +
   ggtitle("Top 10 des films du genre\n Western les mieux notés ")
 
-
 ```
+
+#### 10) Etablir une critique sur les données et les statistiques que vous avez produites. Proposer éventuellement d’autres analyses pour compléter
+
+##### En ce qui concerne les données, on a constaté beaucoup de cases vides dans les données. En effet, on ne sait pas si ces données n'étaient pas vraiment disponibles au moment de la cueillete ou pas. En outre, concernant la variable year, la saisie a été faite au début en mentionnant que l'année et, tout d'un coup, soit en 2019, on a mis "TV Movie 2019" au lieu de mettre l'année 2019 simplement.Nous avons observé également qu'il y a des variables qui sont identiques dans la data, à savoir les variables avg_vote et avg_vote10.*
+
+#### Pour ce qui est des statistiques que nous avons réalisées, le problème se pose au niveau de certaines genres de films pour lesquelles il n'y a pas beaucoup de films. Par conséquent, il n'est pas possible de faire un top 10 des films les mieux notés pour ces genres.
+
+
+#### Concernant les analyses, on déduit qu'on pourrait faire les analyses ci-dessous pour compléter :
+#### 1. Le profit des top 10 des films pour chaque genre;
+#### 2. Les acteurs et réalisateurs qui ont apporté le plus de valeur à un film;
+#### 3. Les genres de film les plus rentables;
+#### 4. Les genres de film que les gens ont le plus regardé (ou noté) depuis 2000;
+#### 5. Le nombre de langues uniques, le nom de ces langues, le nombre total de films disponibles dans une langue particulière
+
+
+
