@@ -10,6 +10,26 @@ td{
 
 }
 
+.main-footer{
+  font-family:"Trebuchet MS", sans-serif;
+  font-weight: 400;
+  background-color: #3C8DBC;
+  color: white !important;
+}
+
+table td {
+max-width: 120px;
+white-space: nowrap;
+text-overflow: ellipsis;
+word-break: break-all;
+overflow: hidden;
+}
+
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    text-align: right;
+    display: none;
+}
 
 
 tr
@@ -27,11 +47,10 @@ br
 	mso-background-source:auto;
 	mso-pattern:auto;
 	color:black;
-
 	font-weight:400;
 	font-style:normal;
 	text-decoration:none;
-	font-family:Calibri, sans-serif;
+	font-family:"Trebuchet MS", sans-serif !important;
 	mso-font-charset:0;
 	border:none;
 	mso-protection:locked visible;
@@ -48,7 +67,7 @@ td
 	font-weight:400;
 	font-style:normal;
 	text-decoration:none;
-	font-family:Calibri, sans-serif;
+	font-family:"Trebuchet-MS", sans-serif!important;
 	mso-font-charset:0;
 	mso-number-format:General;
 	text-align:general;
@@ -78,7 +97,7 @@ td
 	{mso-style-parent:style0;
 
 	font-weight:700;
-	font-family:"Trebuchet MS", sans-serif;
+	font-family:"Trebuchet MS", sans-serif!important;
 	mso-font-charset:0;
 	text-align:left;
 	vertical-align:middle;
@@ -95,7 +114,7 @@ td
 	{mso-style-parent:style0;
 
 	font-weight:700;
-	font-family:"Trebuchet MS", sans-serif;
+	font-family:"Trebuchet MS", sans-serif!important;
 	mso-font-charset:0;
 	text-align:left;
 	vertical-align:middle;
@@ -112,7 +131,7 @@ td
 	{mso-style-parent:style0;
 
 	font-weight:700;
-	font-family:"Trebuchet MS", sans-serif;
+	font-family:"Trebuchet MS", sans-serif!important;
 	mso-font-charset:0;
 	text-align:left;
 	vertical-align:middle;
@@ -128,7 +147,7 @@ td
 .xl70
 	{mso-style-parent:style0;
 
-	font-family:"Trebuchet MS", sans-serif;
+	font-family:"Trebuchet MS", sans-serif!important;
 	mso-font-charset:0;
 	text-align:left;
 	vertical-align:middle;
@@ -144,7 +163,7 @@ td
 .xl71
 	{mso-style-parent:style0;
 
-	font-family:"Trebuchet MS", sans-serif;
+	font-family:"Trebuchet MS", sans-serif!important;
 	mso-font-charset:0;
 	text-align:left;
 	vertical-align:middle;
@@ -160,7 +179,7 @@ td
 .xl72
 	{mso-style-parent:style0;
 
-	font-family:"Trebuchet MS", sans-serif;
+	font-family:"Trebuchet MS", sans-serif!important;
 	mso-font-charset:0;
 	text-align:left;
 	vertical-align:top;
@@ -175,8 +194,7 @@ td
 	mso-char-indent-count:1;}
 .xl73
 	{mso-style-parent:style0;
-
-	font-family:"Trebuchet MS", sans-serif;
+	font-family:"Trebuchet MS", sans-serif!important;
 	mso-font-charset:0;
 	text-align:left;
 	vertical-align:top;

@@ -4,10 +4,10 @@
 
 
 # Define dashboardHeader()
-header <- dashboardHeader(title = "Movies Database",
+header <- dashboardHeader(title = paste("Movies database"),
                           
                           tags$li(class="dropdown",
-                                  tags$a(href="https://github.com/aagarw30/R-Shinyapp-Tutorial", icon("github"), 
+                                  tags$a(href="https://github.com/htsull/R-Project-TIDE-2021/tree/main/Project_2021_sol/Shiny_app", icon("github"), 
                                          "Source Code", 
                                          target="_blank")
                                 )
@@ -16,7 +16,7 @@ header <- dashboardHeader(title = "Movies Database",
                          
                           
 # Define dashboardSidebar()
-sidebar <- dashboardSidebar(
+sidebar <- dashboardSidebar(minified = F, collapsed = TRUE,
   sidebarMenu(
         menuItem("Movies Infos", tabName = "movies_infos", icon = icon("film"),
                  badgeLabel =icon("info-circle"), badgeColor = "light-blue"),
@@ -28,7 +28,6 @@ sidebar <- dashboardSidebar(
 )
 
 
-
 # Define dashboardBody()
 body <- dashboardBody(
   
@@ -36,7 +35,12 @@ body <- dashboardBody(
     # head links tag for css stylesheet
     tags$head(
         tags$link(rel = "stylesheet", type = "text/css", href = "stylesheet.css"),
-        tags$style("tfoot {display: table-header-group;}")
+        tags$style("tfoot {display: table-header-group;}"),
+         tags$link(rel="stylesheet", type="text/css", href="style.css"),
+         tags$link(rel="stylesheet",
+                   href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css",
+                   integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p",
+                   crossorigin="anonymous")
     ),
     
     tabItems(
@@ -51,15 +55,13 @@ body <- dashboardBody(
                # Define User inputs
                selectInput("decade", 
                               label = "Choose decade", 
-                              choices = decade_val,
-                              selected = NULL
+                              choices = decade_val
                               ),
                
                selectInput("title",
                            label = "Choose title below",
                            choices = ""
                            ),
-               
                textOutput("founds"),
                
                ),
@@ -76,75 +78,75 @@ body <- dashboardBody(
 tabItem("data_table",
     fluidPage(
         fluidRow(
-            column(3,
+            column(4,
                    selectInput("tab_fil1",
                                label = "Filter Select",
-                               choices = c("Language", "Actor", "Genre")
+                               choices = c("Country","Language", "Genre")
                                 )
                    ),
             
-            column(3,
+            column(4,
                    selectInput("tab_fil2",
                                label = "",
                                choices = "")
                    ),
-            column(3,
-                   sliderInput("tab_fil3",
+            column(4,
+                   numericInput("tab_fil3",
                                label = "Number of observations",
                                min = 0,
-                               max = 100,
-                               step = 10,
-                               value = 30
+                               max = Inf,
+                               value = 50
                                )
                    )
-            
-            
             ),
-        
+        textOutput("founds2"),
         dataTableOutput("data_view")
     )
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         
         ),
 
 tabItem("hall_of_fame",
+        fluidPage(
+          fluidRow(
+            column(6,
+            selectInput("HOF_fil1",
+                        label = "Select filter below",
+                        choices = c("Decade", "Genre", "Year")
+                        )
+          ), 
+          column(6,
+            selectInput("HOF_fil2",
+                        label = "",
+                        choices = "")
+          )
+          ),
+          fluidRow(
+            uiOutput("podium_table")
+          )
+          )
+        )
         
         )
-      )
+      
 )
 
+footer = dashboardFooter(
+  left = "By Berthony Sully & Landy Clément",
+  right = "Paris 1 Panthéon-Sorbonne, TIDE 2021-2022"
+)
+
+
+
 # ui out to server
-ui<-dashboardPage(header, sidebar, body)
+ui<-dashboardPage(header, sidebar, body,footer= footer )
 
 
 
 ################################################################################
 
 
-    # footer = dashboardFooter(
-    #     left = "By Divad Nojnarg",
-    #     right = "Zurich, 2019"
-    #     )
-
-               # selectInput("language",
-               #             label = "Choose language",
-               #             choices= c("All",testLang)
-               #             ),
 
 
-               # actionButton("submit",
-               #              label = "Submit",
-               #          icon = icon('angle-right',lib = 'font-awesome')
-               #          ),
-               # textOutput("test")
 
 
