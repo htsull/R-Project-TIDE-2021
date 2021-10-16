@@ -1,0 +1,14 @@
+name: Shiny_app_test
+title: Shiny_app_test
+username:
+account: htsull
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4877516
+bundleId: 5144499
+url: https://htsull.shinyapps.io/Shiny_app_test/
+when: 1634369456.26461
+lastSyncTime: 1634369456.26461
+asMultiple: FALSE
+asStatic: FALSE
+ignoredFiles: www/styling.css

@@ -2,12 +2,15 @@
 # TIDE 2021-2022
 # Par Berthony Sully et Clément Landy
 
+options(spinner.color="#0275D8", spinner.color.background="#ffffff", spinner.size=2)
+
 
 # Define dashboardHeader()
-header <- dashboardHeader(title = paste("Movies database"),
+header <- dashboardHeader(title = "Movies Database",
                           
                           tags$li(class="dropdown",
-                                  tags$a(href="https://github.com/htsull/R-Project-TIDE-2021/tree/main/Project_2021_sol/Shiny_app", icon("github"), 
+                                  tags$a(href="https://github.com/htsull/R-Project-TIDE-2021/tree/main/Project_2021_sol/Shiny_app", 
+                                         icon("github"), 
                                          "Source Code", 
                                          target="_blank")
                                 )
@@ -28,20 +31,33 @@ sidebar <- dashboardSidebar(minified = F, collapsed = TRUE,
 )
 
 
+
 # Define dashboardBody()
 body <- dashboardBody(
   
+  # https://stackoverflow.com/questions/40985684/r-shiny-present-a-shinybs-modal-popup-on-page-visit-no-user-action
+  bsModalNoClose("window", "Window",
+                 title="Project Details", size="medium",
+                 h4(description, align = "center", ),
+                 # footer = h4(actionLink('create_account',),align='center'),
+                 tags$head(tags$style("#window .modal-footer{display:none}
+                                       .modal-header .close{display:block}"),
+                           tags$script("$(document).ready(function(){
+                                        $('#window').modal();
+                                        });")
+                 )),
 
+  
     # head links tag for css stylesheet
-    tags$head(
-        tags$link(rel = "stylesheet", type = "text/css", href = "stylesheet.css"),
-        tags$style("tfoot {display: table-header-group;}"),
-         tags$link(rel="stylesheet", type="text/css", href="style.css"),
-         tags$link(rel="stylesheet",
-                   href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css",
-                   integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p",
-                   crossorigin="anonymous")
-    ),
+  tags$head(
+    tags$link(rel = "stylesheet", type = "text/css", href = "stylesheet.css"),
+    tags$style("tfoot {display: table-header-group;}"),
+    tags$link(rel="stylesheet", type="text/css", href="style.css"),
+    tags$link(rel="stylesheet",
+              href="https://pro.fontawesome.com/releases/v5.10.0/css/all.css",
+              integrity="sha384-AYmEC3Yw5cVb3ZcuHtOA93w35dYTsvhLPVnYs9eStHfGJvOvKxVfELGroGkvsg+p",
+              crossorigin="anonymous")
+  ),
     
     tabItems(
       
@@ -55,20 +71,22 @@ body <- dashboardBody(
                # Define User inputs
                selectInput("decade", 
                               label = "Choose decade", 
-                              choices = decade_val
+                              choices = decade_val,
+                              selected = NULL
                               ),
                
                selectInput("title",
                            label = "Choose title below",
                            choices = ""
                            ),
+               
                textOutput("founds"),
                
                ),
         
         
         column(9,
-               uiOutput("filtered_table")
+               uiOutput("filtered_table") %>% withSpinner(type = 6)
                )
                
         )
@@ -77,59 +95,55 @@ body <- dashboardBody(
 
 tabItem("data_table",
     fluidPage(
-        fluidRow(
-            column(4,
-                   selectInput("tab_fil1",
-                               label = "Filter Select",
-                               choices = c("Country","Language", "Genre")
-                                )
-                   ),
-            
-            column(4,
-                   selectInput("tab_fil2",
-                               label = "",
-                               choices = "")
-                   ),
-            column(4,
-                   numericInput("tab_fil3",
-                               label = "Number of observations",
-                               min = 0,
-                               max = Inf,
-                               value = 50
-                               )
-                   )
-            ),
-        textOutput("founds2"),
-        dataTableOutput("data_view")
+      fluidRow(
+        column(4,
+               selectInput("tab_fil1",
+                           label = "Filter Select",
+                           choices = c("Country","Language", "Genre")
+               )
+        ),
+        
+        column(4,
+               selectInput("tab_fil2",
+                           label = "",
+                           choices = "")
+        ),
+        column(4,
+               numericInput("tab_fil3",
+                            label = "Number of observations",
+                            min = 0,
+                            max = Inf,
+                            value = 50
+               )
+        )
+      ),
+      textOutput("founds2"),
+      dataTableOutput("data_view") %>%  withSpinner(type = 6)
     )
-        
-        
         ),
 
 tabItem("hall_of_fame",
         fluidPage(
           fluidRow(
             column(6,
-            selectInput("HOF_fil1",
-                        label = "Select filter below",
-                        choices = c("Decade", "Genre", "Year")
-                        )
-          ), 
-          column(6,
-            selectInput("HOF_fil2",
-                        label = "",
-                        choices = "")
-          )
+                   selectInput("HOF_fil1",
+                               label = "Select filter below",
+                               choices = c("Decade", "Genre", "Year")
+                   )
+            ), 
+            column(6,
+                   selectInput("HOF_fil2",
+                               label = "",
+                               choices = "")
+            )
           ),
           fluidRow(
             uiOutput("podium_table")
           )
-          )
         )
-        
-        )
-      
 )
+        )
+      )
 
 footer = dashboardFooter(
   left = "By Berthony Sully & Landy Clément",
@@ -137,16 +151,11 @@ footer = dashboardFooter(
 )
 
 
-
 # ui out to server
-ui<-dashboardPage(header, sidebar, body,footer= footer )
+ui<-dashboardPage(header, sidebar, body, footer=footer)
 
 
 
 ################################################################################
-
-
-
-
 
 
