@@ -7,7 +7,7 @@ options(spinner.color="#0275D8", spinner.color.background="#ffffff", spinner.siz
 
 
 # Define dashboardHeader()
-header <- dashboardHeader(title = "Movies Database",
+header <- dashboardHeader(title =  "Movie Database",
                           
                           tags$li(class="dropdown",
                                   tags$a(href="https://github.com/htsull/R-Project-TIDE-2021/tree/main/Project_2021_sol/Shiny_app", 
@@ -40,11 +40,15 @@ body <- dashboardBody(
   
   # Found at https://stackoverflow.com/questions/40985684/r-shiny-present-a-shinybs-modal-popup-on-page-visit-no-user-action
   bsModalNoClose("window", "Window",
-                 title="Project Details", size="medium",
-                 h4(description, align = "center", ),
+                 title="Project Details", size="large",
+                 h4("English", align = "justify"),
+                 h5(description_eng, align = "justify"),
+                 # h4("", align = "justify"),
+                 h4("French", align = "justify"),
+                 h5(description_fr, align = "justify"),
                  # footer = h4(actionLink('create_account',),align='center'),
-                 tags$head(tags$style("#window .modal-footer{display:none}
-                                       .modal-header .close{display:block}"),
+                 tags$head(tags$style("#window .modal-footer{display:bloc}
+                                       .modal-header .close{display:none}"),
                            tags$script("$(document).ready(function(){
                                         $('#window').modal();
                                         });")
