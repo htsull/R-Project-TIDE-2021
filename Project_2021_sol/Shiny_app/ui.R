@@ -1,7 +1,8 @@
 # Shiny dashboard project
 # TIDE 2021-2022
-# Par Berthony Sully et Clément Landy
+# Par Berthony Sully et Landy Clément 
 
+# global option for sipnners
 options(spinner.color="#0275D8", spinner.color.background="#ffffff", spinner.size=2)
 
 
@@ -26,7 +27,9 @@ sidebar <- dashboardSidebar(minified = F, collapsed = TRUE,
         menuItem("Data Table", icon = icon("th"), tabName = "data_table",
                  badgeLabel =icon("database"), badgeColor = "light-blue"),
         menuItem("Hall of Fame", icon = icon("trophy"), tabName = "hall_of_fame", 
-             badgeLabel =icon("sort-amount-up"), badgeColor = "light-blue")
+             badgeLabel =icon("sort-amount-up"), badgeColor = "light-blue"),
+        menuItem("DataViz", icon = icon("eye"), tabName = "data_viz", 
+             badgeLabel =icon("chart-bar"), badgeColor = "light-blue")
               )
 )
 
@@ -35,7 +38,7 @@ sidebar <- dashboardSidebar(minified = F, collapsed = TRUE,
 # Define dashboardBody()
 body <- dashboardBody(
   
-  # https://stackoverflow.com/questions/40985684/r-shiny-present-a-shinybs-modal-popup-on-page-visit-no-user-action
+  # Found at https://stackoverflow.com/questions/40985684/r-shiny-present-a-shinybs-modal-popup-on-page-visit-no-user-action
   bsModalNoClose("window", "Window",
                  title="Project Details", size="medium",
                  h4(description, align = "center", ),
@@ -141,9 +144,33 @@ tabItem("hall_of_fame",
             uiOutput("podium_table")
           )
         )
+),
+tabItem("data_viz",
+        fluidPage(
+          fluidRow(
+            column(6,
+                   
+                   pickerInput(
+                     inputId = "dec_fil1",
+                     label = "Select decade below",
+                     choices = decade_val,
+                     multiple = FALSE,
+                     choicesOpt = list(
+                       disabled = decade_val %in% decade_val[1:2]
+                     )
+                     )
+          ),
+          column(6,
+                 verbatimTextOutput("cont")
+                 )
+          ),
+          fluidRow(
+            plotOutput("countTitleGraph",width = "70%") %>%  withSpinner(type = 6)
+          )
+        )
 )
         )
-      )
+    )
 
 footer = dashboardFooter(
   left = "By Berthony Sully & Landy Clément",

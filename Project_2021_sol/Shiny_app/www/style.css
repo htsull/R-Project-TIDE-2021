@@ -103,3 +103,20 @@ body {
   font-weight: 700;
 }
 
+
+#cont {
+    position: relative;
+    top: 20px;
+    font-weight: 700;
+    background-color: white;
+    padding: 10px;
+    text-align: center;
+    border-radius: 5px;
+    margin-bottom: 30px;
+}
+
+#countTitleGraph{
+    position: relative;
+    margin: auto;
+    height: auto;
+}

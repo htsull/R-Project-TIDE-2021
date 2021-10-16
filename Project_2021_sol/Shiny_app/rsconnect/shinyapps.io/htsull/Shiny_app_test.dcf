@@ -5,10 +5,10 @@ account: htsull
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 4877516
-bundleId: 5144499
+bundleId: 5144678
 url: https://htsull.shinyapps.io/Shiny_app_test/
-when: 1634369456.26461
-lastSyncTime: 1634369456.26461
+when: 1634377774.3639
+lastSyncTime: 1634377774.3639
 asMultiple: FALSE
 asStatic: FALSE
 ignoredFiles: www/styling.css

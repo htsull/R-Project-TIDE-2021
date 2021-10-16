@@ -220,98 +220,21 @@ data_view_out <- data_ %>%
   })
   
  
-  
-  
+  output$countTitleGraph <- renderPlot({
+    years <- data_[data_$decade == input$dec_fil1,]
+    
+    ggplot(years, aes(x=year))+
+      geom_bar(aes(y=..count..))+
+      xlab("Year") + ylab("Count")+
+      scale_y_continuous(n.breaks = 10) +
+      scale_x_continuous(n.breaks = 10)+
+      geom_text(aes(label = ..count..), stat = "count", 
+                vjust = 1.5, colour = "white")
+  })
+  output$cont <- renderText("There is only one film published in the first two decades each")
 
 }
 
 #####################################################################
 
-
-
-
-
-
-# titleChoices <- reactive({
-#   data_$title[data_$decade == input$decade & str_detect(data_$language, input$language)]
-# })
-
-
-# observeEvent(
-#   input$decade,
-#   updateSelectInput(session,
-#                     inputId = "language",
-#                     label = "Language",
-#                     choices = uniLang())
-#   )
-# 
-# uniLang <- reactive({
-#   lang1 <- data_$language[grepl("French", data_$language)]
-#   lang2 <- paste(lang1, collapse = ',')
-#   lang3 <- strsplit(lang2, ",")
-#   lang4 <- lang3[[1]] %>% unique %>% sort() %>%  as.list()
-# })
-
-#to use fo language filter
-# testLang <- data_$language[grepl("French", data_$language)] %>%
-#   paste(collapse = ',') %>%
-#   strsplit(",")
-# testLang <- testLang[[1]] %>% 
-#   unique %>% sort() %>%  as.list()
-
-
-
-
-# dashboardFooter <- function(left = NULL, right = NULL) {
-#   htmltools::tags$footer(
-#     class = "main-footer",
-#     shiny::tags$div(class = "pull-right hidden-xs", right),
-#     left
-#     )
-# 
-#   }
-
-# 
-# filter_data <- function(x){
-#   eval(parse("data_$",x,"[data_$decade == input$decade & data_$title == input$title]")) 
-# }
-
-
-# slice_choices <- reactive({
-#   data_$title[data_$decade == input$decade] %>% filter(contains("a"))
-# })
-# 
-# observeEvent(
-#   input$decade,
-#   updateSelectInput(session,
-#                     inputId = "a_d",
-#                     label = "A_D",
-#                     choices = slice_choices()
-#                     )
-# )
-
-# 
-# testServer <- eventReactive(input$submit, {
-#   paste("click")
-# })
-# 
-# output$test <- reactive({
-#   testServer()
-#   
-# })
-# 
-# observe({
-#   if (input$choose_tab == "Automatic") {
-#     output$test <- renderUI({
-#       plotOutput("plot1", height = 250)
-#     })
-#   }
-#   else if(input$choose_tab == "Manual") {
-#     output$test <- renderUI({
-#       plotOutput("plot2", height = 250, click = "plot_click")
-#     })
-#   }
-# })
-
-  
   
