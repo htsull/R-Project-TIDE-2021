@@ -49,7 +49,7 @@ merge_df = function(path_to_folder){
 
 # write.csv(x = df, file = "complete_data.csv")
 
-complete_data <- read.csv(file = "./complete_data.csv", header = T)
+dt <- read.csv(file = "./complete_data.csv", header = T)
 
 ```
 
@@ -57,13 +57,13 @@ complete_data <- read.csv(file = "./complete_data.csv", header = T)
 
 #### nombre de valeurs manquantes
 ```{r}
-sapply(complete_data,function(x) sum(is.na(x)))
+sapply(dt,function(x) sum(is.na(x)))
 ```
 #### Nous constatons que certaines variable de la data ont des cases vides. Ainsi, nous avons  décidé de les gérer comme des NAs.*
 
 ```{r}
-complete_data[complete_data == ""]<- NA # Remplacer les vides par des NAs.
-sapply(complete_data,function(x) sum(is.na(x)))
+dt[dt == ""]<- NA # Remplacer les vides par des NAs.
+sapply(dt,function(x) sum(is.na(x)))
 ```
 #### Après avoir remplacé les cases vides par des Nas, nous voyons que le nbre de Nas augmente pour certaines variables et que d'autres qui n'en ont pas, ont maintenant de Nas.
 #### Affichons maintenant le pourcentage de Nas pour chaque variable
@@ -71,7 +71,7 @@ sapply(complete_data,function(x) sum(is.na(x)))
 
 ```{r}
 #  Presentage of missng values
-na_percent <- round(sapply(complete_data,function(x) sum(is.na(x))/length(x))*100, 2)
+na_percent <- round(sapply(dt,function(x) sum(is.na(x))/length(x))*100, 2)
 
 print.table(na_percent)
 ```
@@ -80,8 +80,8 @@ print.table(na_percent)
 
 ```{r, message=FALSE}
 library(tidyverse)
-complete_data$duration <- as.numeric(complete_data$duration)
-ggplot(complete_data, aes(x = duration, fill = duration)) +
+dt$duration <- as.numeric(dt$duration)
+ggplot(dt, aes(x = duration, fill = duration)) +
   geom_histogram(color = "green", binwidth = 50, alpha = 1) +
   theme(plot.title = element_text(hjust = 0.5)) + 
   labs(title = 'Représentation graphique de la durée des films', x = 'Durée', y = 'Effectif') +
@@ -94,7 +94,7 @@ ggplot(complete_data, aes(x = duration, fill = duration)) +
 
 ```{r}
 library(stringr)
-complete_data %>% 
+dt %>% 
   filter(str_detect(language, "French|.French.")) %>% 
   select(language) %>% 
   count() %>% 
@@ -106,30 +106,30 @@ complete_data %>%
 ##### Voyons le type de la variable year
 
 ```{r}
-paste("La variable Year est de type :", typeof(complete_data$year))
+paste("La variable Year est de type :", typeof(dt$year))
 ```
 #### On peut essayer de voir les valeurs uniques de year pour avoir une plus nette explication
 ```{r}
-unique(complete_data$year)
+unique(dt$year)
 ```
 #### La valeur "TV Movie 2019" semble être le probleme. Pour cela, étant donné qu'on connait le contexe on peut remplacer cette valeur par "2019" et convertir la variable au type 'numeric.
 
 
 ```{r, message=FALSE, warning=FALSE}
 # Select year column
-complete_data$year <- complete_data$year %>% 
+dt$year <- dt$year %>% 
   #convert as numeric type
   as.numeric %>% 
   #replace the NA value with 2019
   replace_na(., 2019)
 #show unique value of recently created year column
-unique(complete_data$year)
+unique(dt$year)
 ```
 
 
 ```{r}
 #creation of the "decade variable"
-complete_data$decade <- cut(complete_data$year, 
+dt$decade <- cut(dt$year, 
                             breaks = c(seq(1890, 
                                            2020, 10)),
                             labels = c("1890 - 1900",
@@ -149,7 +149,7 @@ complete_data$decade <- cut(complete_data$year,
                             include.lowest = T)
 
 #randomly select some line in year and decade columns to verify the results
-complete_data %>% 
+dt %>% 
   select(year, decade)%>% 
   sample_n(50) %>% datatable()
 ```
@@ -158,14 +158,14 @@ complete_data %>%
 ### 6. Proposer une représentation graphique permettant d’observer pour chaque décennie, le nombre et la proportion de films dans lesquels la langue française apparait.
 
 ```{r}
-dt <- complete_data %>%
+df <- dt %>%
 select(language, decade) %>%
 group_by(decade) %>%
 count(french = str_detect(language, "French|.French.")) %>%
 mutate(p = scales::percent(n / sum(n))) %>%
 filter(french == TRUE)
 
-ggplot(dt, aes(x=decade,y=n, fill=decade)) +
+ggplot(df, aes(x=decade,y=n, fill=decade)) +
 geom_bar(stat="identity", color="black")+
 geom_text(aes(label=p), vjust=-0.3, size=3.5)+
 theme(axis.text.x = element_text(angle=90, vjust=.5, hjust=1, colour = rainbow(11))) +
@@ -181,7 +181,7 @@ x = "Décennie", y = "Effectif")+
 #### Vu que les variables avg_vote et avg_vote_10 sont identiques, on a décidé de garder que la variable avg_vote_10.
 
 ```{r}
-data <-complete_data %>% 
+data <-dt %>% 
   select(starts_with("avg_vote_"))
 
 report <- function(x, name) { 
@@ -205,6 +205,7 @@ Ind_Stat <- data %>% imap_dfr(report)
 
 
 datatable(Ind_Stat,)
+
 ```
 
 
@@ -248,7 +249,6 @@ ggplot(Ind_Stat, aes(x=variable, y=min, fill=variable)) +
   theme_minimal()
 ```
 
- 
 #### 8. Proposer une représentation graphique permettant d’observer s’il existe une différence de notation en fonction du genre de film
 
 ```{r}
@@ -261,16 +261,16 @@ uni_ <- function(data){
     unique() %>%
     sort
 }
-genre <- uni_(complete_data$genre);genre   # Visualiser le nombre de genres différents de la data
+genre <- uni_(dt$genre);genre   # Visualiser le nombre de genres différents de la data
 ```
 
 
 ```{r}
 
 avg_vote_genre <- function(x){
-  dt <- complete_data %>%
+  dt_avg <- dt %>%
     filter(grepl(x, genre))
-  return (mean(dt$avg_vote))
+  return (mean(dt_avg$avg_vote))
 }
 note_film_genre <- genre %>%
   sapply(avg_vote_genre)
@@ -291,7 +291,7 @@ ggplot(df_avg_vote_genre, aes(y = avg_vote, x =fct_rev(fct_reorder(genre, avg_vo
 #### 9) Pour chaque genre de film, représenter graphiquement le top 10 des films les mieux notés
 
 ```{r}
-Ac <- complete_data %>% 
+Ac <- dt %>% 
   filter(str_detect(genre, "Action")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -304,7 +304,7 @@ ggplot(Ac, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ggtitle("Top 10 des films du genre\n Action les mieux notés ")
 
 
- Ad <- complete_data %>% 
+ Ad <- dt %>% 
   filter(str_detect(genre, "Adult")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -316,7 +316,7 @@ ggplot(Ad, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ylab("Notes") +
   ggtitle("Les 2 films du genre Adult")
 
-Adv <- complete_data %>% 
+Adv <- dt %>% 
   filter(str_detect(genre, "Adventure")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -328,7 +328,7 @@ ggplot(Adv, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ylab("Notes") +
   ggtitle("Top 10 des films du genre\n Adventure les mieux notés ")
 
-Ani <- complete_data %>% 
+Ani <- dt %>% 
   filter(str_detect(genre, "Animation")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -340,7 +340,7 @@ ggplot(Ani, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ylab("Notes") +
   ggtitle("Top 10 des films du genre\n Animation les mieux notés ")
 
-Bio <- complete_data %>% 
+Bio <- dt %>% 
   filter(str_detect(genre, "Biography")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -352,7 +352,7 @@ ggplot(Bio, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ylab("Notes") +
   ggtitle("Top 10 des films du genre\n Biography les mieux notés ")
 
-Co <- complete_data %>% 
+Co <- dt %>% 
   filter(str_detect(genre, "Comedy")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -364,7 +364,7 @@ ggplot(Co, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ylab("Notes") +
   ggtitle("Top 10 des films du genre\n Comedy les mieux notés ")
 
-Cr <- complete_data %>% 
+Cr <- dt %>% 
   filter(str_detect(genre, "Crime")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -376,7 +376,7 @@ ggplot(Cr, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ylab("Notes") +
   ggtitle("Top 10 des films du genre\n Crime les mieux notés ")
 
-Doc <- complete_data %>% 
+Doc <- dt %>% 
   filter(str_detect(genre, "Documentary")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -388,7 +388,7 @@ ggplot(Doc, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ylab("Notes") +
   ggtitle("Les 2 films du genre Documentary")
 
-Dra <- complete_data %>% 
+Dra <- dt %>% 
   filter(str_detect(genre, "Drama")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -400,7 +400,7 @@ ggplot(Dra, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ylab("Notes") +
   ggtitle("Top 10 des films du genre\n Drama les mieux notés ")
 
-Fam <- complete_data %>% 
+Fam <- dt %>% 
   filter(str_detect(genre, "Family")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -413,7 +413,7 @@ ggplot(Fam, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ggtitle("Top 10 des films du genre\n Family les mieux notés ")
   
 
-Fan <- complete_data %>% 
+Fan <- dt %>% 
   filter(str_detect(genre, "Fantasy")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -427,7 +427,7 @@ ggplot(Fan, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
 
 
 
-Film <- complete_data %>% 
+Film <- dt %>% 
   filter(str_detect(genre, "Film-Noir")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -440,7 +440,7 @@ ggplot(Film, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="medi
   ggtitle("Top 10 des films du genre\n Film-Noir les mieux notés ")
 
 
-His <- complete_data %>% 
+His <- dt %>% 
   filter(str_detect(genre, "History")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -453,7 +453,7 @@ ggplot(His, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ggtitle("Top 10 des films du genre\n History les mieux notés ")
 
 
-Ho <- complete_data %>% 
+Ho <- dt %>% 
   filter(str_detect(genre, "Horror")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -466,7 +466,7 @@ ggplot(Ho, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ggtitle("Top 10 des films du genre\n Horror les mieux notés ")
 
 
-Mus <- complete_data %>% 
+Mus <- dt %>% 
   filter(str_detect(genre, "Music")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -479,7 +479,7 @@ ggplot(Mus, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ggtitle("Top 10 des films du genre\n Music les mieux notés ")
 
 
-Mu <- complete_data %>% 
+Mu <- dt %>% 
   filter(str_detect(genre, "Musical")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -492,7 +492,7 @@ ggplot(Mu, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ggtitle("Top 10 des films du genre\n Musical les mieux notés ")
 
 
-Mys <- complete_data %>% 
+Mys <- dt %>% 
   filter(str_detect(genre, "Mystery")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -505,7 +505,7 @@ ggplot(Mys, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ggtitle("Top 10 des films du genre\n Mystery les mieux notés ")
 
 
-News <- complete_data %>% 
+News <- dt %>% 
   filter(str_detect(genre, "News")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -518,7 +518,7 @@ ggplot(News, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="medi
   ggtitle("L'unique film du genre News")
 
 
-Real <- complete_data %>% 
+Real <- dt %>% 
   filter(str_detect(genre, "Reality-TV")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -531,7 +531,7 @@ ggplot(Real, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="medi
   ggtitle("Les 3 films du genre Reality-TV\n en fonction de leur note")
 
 
-Ro <- complete_data %>% 
+Ro <- dt %>% 
   filter(str_detect(genre, "Romance")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -544,7 +544,7 @@ ggplot(Ro, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ggtitle("Top 10 des films du genre\n Romance les mieux notés ")
 
 
-Sci <- complete_data %>% 
+Sci <- dt %>% 
   filter(str_detect(genre, "Sci-Fi")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -557,7 +557,7 @@ ggplot(Sci, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ggtitle("Top 10 des films du genre\n Sci-Fi les mieux notés ")
 
 
-Sp <- complete_data %>% 
+Sp <- dt %>% 
   filter(str_detect(genre, "Sport")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -570,7 +570,7 @@ ggplot(Sp, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
   ggtitle("Top 10 des films du genre\n Sport les mieux notés ")
 
 
-Thr <- complete_data %>% 
+Thr <- dt %>% 
   filter(str_detect(genre, "Thriller")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -583,7 +583,7 @@ ggplot(Thr, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
   ggtitle("Top 10 des films du genre\n Thriller les mieux notés ")
 
 
-Wa <- complete_data %>% 
+Wa <- dt %>% 
   filter(str_detect(genre, "War")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
@@ -597,7 +597,7 @@ ggplot(Wa, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="median
 
 
 
-Wes <- complete_data %>% 
+Wes <- dt %>% 
   filter(str_detect(genre, "Western")) %>%
   select(avg_vote, title) %>%
   arrange(desc(avg_vote)) %>% 
