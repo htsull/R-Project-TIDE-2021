@@ -613,17 +613,17 @@ ggplot(Wes, aes(y = avg_vote, x =fct_rev(fct_reorder(title, avg_vote,.fun="media
 
 #### 10) Etablir une critique sur les données et les statistiques que vous avez produites. Proposer éventuellement d’autres analyses pour compléter
 
-##### En ce qui concerne les données, on a constaté beaucoup de cases vides dans les données. En effet, on ne sait pas si ces données n'étaient pas vraiment disponibles au moment de la cueillete ou pas. En outre, concernant la variable year, la saisie a été faite au début en mentionnant que l'année et, tout d'un coup, soit en 2019, on a mis "TV Movie 2019" au lieu de mettre l'année 2019 simplement.Nous avons observé également qu'il y a des variables qui sont identiques dans la data, à savoir les variables avg_vote et avg_vote10.*
+##### En ce qui concerne les données, on a y constaté beaucoup de cases vides. En effet, on ne sait pas si ces données n'étaient pas vraiment disponibles au moment de la collecte. En outre, concernant la variable year, la saisie a été faite au début en mentionnant que l'année et, tout d'un coup, soit en 2019, on a mis "TV Movie 2019" au lieu de mettre l'année 2019 simplement. Nous avons observé également qu'il y a des variables qui ont des observations, à savoir les variables avg_vote et avg_vote10.
 
-#### Pour ce qui est des statistiques que nous avons réalisées, le problème se pose au niveau de certaines genres de films pour lesquelles il n'y a pas beaucoup de films. Par conséquent, il n'est pas possible de faire un top 10 des films les mieux notés pour ces genres.
+#### En ce qui concerne les statistiques que nous avons réalisées, le problème se pose au niveau de certaines genres de films pour lesquelles il n'y a pas beaucoup de films. Par conséquent, il n'est pas possible de relever un top 10 des films les mieux notés.
 
 
 #### Concernant les analyses, on déduit qu'on pourrait faire les analyses ci-dessous pour compléter :
-#### 1. Le profit des top 10 des films pour chaque genre;
+#### 1. Le profit des top 10 des films pour chaque genre, avec les variables "budget" et "world_gross_income";
 #### 2. Les acteurs et réalisateurs qui ont apporté le plus de valeur à un film;
 #### 3. Les genres de film les plus rentables;
 #### 4. Les genres de film que les gens ont le plus regardé (ou noté) depuis 2000;
-#### 5. Le nombre de langues uniques, le nom de ces langues, le nombre total de films disponibles dans une langue particulière
+#### 5. La quantité unique de langues et le nombre total de films disponibles dans une langue particulière. (Ces resultats sont traités dans l'application shiny produit avec les mèêmes données.
 
 
 
