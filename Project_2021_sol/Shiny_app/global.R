@@ -21,7 +21,7 @@ bsModalNoClose <-function(...) {
   return(b)
 }
 
-description_eng <- "This Shiny application was created as part of a school project by Berthony Sully and Landy Clément as an
+description_eng <- "This Shiny application was created as part of a school project by Berthony Sully as an
 evaluation for the R programming course. 
 
 This application that we propose allows to make a simple visualization of data. 
@@ -37,7 +37,7 @@ Thanks already."
 
 
 
-description_fr <- "Cette application Shiny a été créée dans le cadre d'un projet scolaire par Berthony Sully et Landy Clément en tant 
+description_fr <- "Cette application Shiny a été créée dans le cadre d'un projet scolaire par Berthony Sully en tant 
 qu'évaluation pour le stage de programmation R. 
 
 Cette application que nous proposons permet de faire une visualisation simple des données. 

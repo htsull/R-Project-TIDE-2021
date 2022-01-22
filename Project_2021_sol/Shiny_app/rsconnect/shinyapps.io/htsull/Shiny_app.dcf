@@ -1,0 +1,13 @@
+name: Shiny_app
+title: Shiny_app
+username:
+account: htsull
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4749034
+bundleId: 5213784
+url: https://htsull.shinyapps.io/Shiny_app/
+when: 1636046608.19185
+lastSyncTime: 1636046608.19185
+asMultiple: FALSE
+asStatic: FALSE

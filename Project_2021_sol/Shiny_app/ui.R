@@ -177,7 +177,7 @@ tabItem("data_viz",
     )
 
 footer = dashboardFooter(
-  left = "By Berthony Sully & Landy Clément",
+  left = "By Berthony Sully",
   right = "Paris 1 Panthéon-Sorbonne, TIDE 2021-2022"
 )
 
